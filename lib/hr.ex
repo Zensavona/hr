@@ -1,2 +1,0 @@
-defmodule Hr do
-end
