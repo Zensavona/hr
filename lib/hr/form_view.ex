@@ -4,6 +4,7 @@ defmodule Hr.BaseFormView do
       use Phoenix.View, root: "priv/templates/html"
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
       use Phoenix.HTML
+      # import HrDemo.Router.Helpers
     end
   end
 end

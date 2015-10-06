@@ -11,12 +11,12 @@ defmodule Hr.BaseFormController do
         Entry point for registering new users.
       """
       def new_signup(conn, _) do
-        application = Hr.ApplicationMeta.application_name(conn)
+        application = Hr.ApplicationMeta.app_name(conn)
         # changeset = @user.changeset(%{email: nil, password: nil})
-
+        path = application.Router.Helpers.user_signup_path(conn, :create_signup)
         conn
         |> put_layout({application.LayoutView, :app})
-        |> render("signup.html", user: %{})
+        |> render("signup.html", user: application.User.__struct__, path: path)
       end
 
       # def create_signup(conn, user_params) do
