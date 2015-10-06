@@ -12,11 +12,13 @@ defmodule Hr.BaseFormController do
       """
       def new_signup(conn, _) do
         application = Hr.ApplicationMeta.app_name(conn)
-        # changeset = @user.changeset(%{email: nil, password: nil})
-        path = application.Router.Helpers.user_signup_path(conn, :create_signup)
+        model = unquote(String.to_atom(Hr.ApplicationMeta.model_module))
+        changeset = model.changeset(model.__struct__)
+        path = application.Router.Helpers.unquote(:"#{Hr.ApplicationMeta.model_name}_signup_path")(conn, :create_signup)
+
         conn
         |> put_layout({application.LayoutView, :app})
-        |> render("signup.html", user: application.User.__struct__, path: path)
+        |> render("signup.html", user: changeset, path: path)
       end
 
       # def create_signup(conn, user_params) do
