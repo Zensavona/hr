@@ -5,6 +5,7 @@ defmodule Hr.Mixfile do
     [app: :hr,
      version: "0.0.1",
      elixir: "~> 1.0",
+     compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -14,7 +15,7 @@ defmodule Hr.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :phoenix, :phoenix_html]]
   end
 
   # Dependencies can be Hex packages:
@@ -27,6 +28,10 @@ defmodule Hr.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [
+      {:phoenix, "~> 1.0"},
+      {:phoenix_html, "~> 2.1"},
+      {:yomel, "~> 0.2.2"}
+    ]
   end
 end
