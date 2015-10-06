@@ -8,6 +8,7 @@ defmodule Hr.BaseFormController do
 
       @model unquote(String.to_atom(Hr.ApplicationMeta.model_module))
       @repo Application.get_env(:hr, :repo)
+      @signed_up_url Application.get_env(:hr, :signed_up_url)
 
       @doc """
         Entry point for registering new users.
@@ -30,22 +31,16 @@ defmodule Hr.BaseFormController do
 
         case @repo.insert(changeset) do
           {:ok, user} ->
-            IO.inspect user
-            # conn
-            #   |> Rumbl.Auth.login(user)
-            #   |> put_flash(:info, "#{user.name} created!")
-            #   |> redirect(to: user_path(conn, :index))
+            conn
+            # login |> Rumbl.Auth.login(user)
+            |> put_flash(:info, Hr.Messages.signed_up_but_unconfirmed)
+            |> redirect(to: @signed_up_url)
           {:error, changeset} ->
             conn
             |> put_layout({application.LayoutView, :app})
             |> render("signup.html", changeset: changeset, path: path)
         end
       end
-
-      # def create_signup(conn, params) do
-      #   {conn, message} = Hr.UserHandler.create(user_params) |> SessionInteractor.register(conn)
-      #   json conn, message
-      # end
 
       defoverridable Module.definitions_in(__MODULE__)
     end

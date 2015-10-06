@@ -31,6 +31,7 @@ defmodule Hr.Mixfile do
     [
       {:phoenix, "~> 1.0"},
       {:phoenix_html, "~> 2.1"},
+      {:phoenix_ecto, "~> 1.1"},
       {:yomel, "~> 0.2.2"},
       {:comeonin, "~> 1.0"}
     ]
