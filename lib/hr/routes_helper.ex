@@ -6,7 +6,7 @@ defmodule Hr.RoutesHelper do
   end
 
   defmacro hr(:routes, options \\ %{}) do
-    name = Hr.ApplicationMeta.model_name
+    name = Hr.Meta.model
 
     routes = [
                 [:"new_#{name}_signup", :new_signup, :get],
