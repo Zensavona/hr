@@ -27,4 +27,8 @@ defmodule Hr.ApplicationMeta do
     |> Atom.to_string
     |> Mix.Utils.camelize
   end
+
+  def otp_app do
+    Mix.Project.config()[:app]
+  end
 end

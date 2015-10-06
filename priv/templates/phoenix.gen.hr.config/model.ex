@@ -1,6 +1,6 @@
 defmodule <%= module %> do
   use <%= base %>.Web, :model
-  use Hr.Model
+  use Hr.ModelHelper
 
   schema <%= inspect plural %> do
 <%= for {k, _} <- attrs do %>    field <%= inspect k %>, <%= inspect types[k] %><%= defaults[k] %>

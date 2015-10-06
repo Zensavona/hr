@@ -2,6 +2,7 @@ use Mix.Config
 
 config :hr, locale: :en,
             model: <%= module %>,
+            repo: <%= repo %>,
             logged_in_url: "/",
             not_logged_in_url: "/error",
             logged_out_url: "/",

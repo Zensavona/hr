@@ -5,7 +5,10 @@ defmodule Hr.BaseFormController do
   defmacro __using__(_) do
     quote do
       use Phoenix.Controller
+
       @model unquote(String.to_atom(Hr.ApplicationMeta.model_module))
+      @repo Application.get_env(:hr, :repo)
+
       @doc """
         Entry point for registering new users.
       """
@@ -19,20 +22,24 @@ defmodule Hr.BaseFormController do
       end
 
       def create_signup(conn, %{unquote(Hr.ApplicationMeta.model_name) => params}) do
+        application = Hr.ApplicationMeta.app_name(conn)
+        path = application.Router.Helpers.unquote(:"#{Hr.ApplicationMeta.model_name}_signup_path")(conn, :create_signup)
 
-        changeset = @model.changeset(@model.__struct__, params)
+        changeset = Hr.Model.signup_changeset(@model.__struct__, params)
         IO.inspect changeset
-        # changeset = User.registration_changeset(%User{}, user_params)
 
-        # case Repo.insert(changeset) do
-        #   {:ok, user} ->
-        #     conn
-        #       |> Rumbl.Auth.login(user)
-        #       |> put_flash(:info, "#{user.name} created!")
-        #       |> redirect(to: user_path(conn, :index))
-        #   {:error, changeset} ->
-        #     render(conn, "new.html", changeset: changeset)
-        # end
+        case @repo.insert(changeset) do
+          {:ok, user} ->
+            IO.inspect user
+            # conn
+            #   |> Rumbl.Auth.login(user)
+            #   |> put_flash(:info, "#{user.name} created!")
+            #   |> redirect(to: user_path(conn, :index))
+          {:error, changeset} ->
+            conn
+            |> put_layout({application.LayoutView, :app})
+            |> render("signup.html", changeset: changeset, path: path)
+        end
       end
 
       # def create_signup(conn, params) do
