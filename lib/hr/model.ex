@@ -1,13 +1,19 @@
 defmodule Hr.Model do
   import Ecto.Changeset
-
+  @required ~w(email password)
   def signup_changeset(model, params) do
     model
-      |> cast(params, ~w(email password))
-      |> validate_format(:email, ~r/@/) # replace this with something more robust
-      |> unique_constraint(:email)
-      |> validate_length(:password, min: 6, max: 100)
-      |> put_pass_hash
+    |> cast(params, @required)
+    |> validate_format(:email, ~r/@/) # replace this with something more robust
+    |> unique_constraint(:email)
+    |> validate_length(:password, min: 6, max: 100)
+    |> put_pass_hash
+  end
+
+  def session_changeset(model, params) do
+    model
+    |> cast(params, @required)
+    |> put_pass_hash
   end
 
   defp put_pass_hash(changeset) do

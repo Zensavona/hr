@@ -30,7 +30,7 @@ defmodule Hr.Meta do
   end
 
   def logged_in_url do
-    Applicaton.get_env(:hr, :logged_in_url)
+    Application.get_env(:hr, :logged_in_url)
   end
 
   def not_logged_in_url do
