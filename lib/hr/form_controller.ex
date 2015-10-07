@@ -4,7 +4,8 @@ defmodule Hr.BaseFormController do
   defmacro __using__(_) do
     quote do
       use Phoenix.Controller
-      @model unquote(String.to_atom(Hr.Meta.model_module))
+      @repo Hr.Meta.repo
+      @model String.to_atom(Hr.Meta.model_module)
       @identity Hr.Meta.identity_model
 
       @doc """
@@ -24,8 +25,7 @@ defmodule Hr.BaseFormController do
         path = application.Router.Helpers.unquote(:"#{Hr.Meta.model}_signup_path")(conn, :create_signup)
 
         changeset = Hr.Model.signup_changeset(@model.__struct__, params)
-
-        case Hr.UserHelper.create(changeset) do
+        case @repo.insert(changeset) do
           {:ok, user} ->
             conn
             |> Hr.Session.login(user)
@@ -35,6 +35,22 @@ defmodule Hr.BaseFormController do
             conn
             |> put_layout({application.LayoutView, :app})
             |> render("signup.html", changeset: changeset, path: path)
+        end
+      end
+
+      def new_confirmation(conn, params = %{"id" => user_id, "confirmation_token" => _}) do
+        user = @repo.get! @model, user_id
+        changeset = Hr.Model.confirmation_changeset user, params
+
+        if changeset.valid? do
+          @repo.update!(changeset)
+          conn
+          |> put_flash(:info, "Email confirmed.")
+          |> redirect(to: Hr.Meta.signed_up_url)
+        else
+          conn
+          |> put_flash(:info, "That token has already been used.")
+          |> redirect(to: Hr.Meta.signed_up_url)
         end
       end
 
@@ -52,7 +68,6 @@ defmodule Hr.BaseFormController do
         path = application.Router.Helpers.unquote(:"#{Hr.Meta.model}_session_path")(conn, :create_session)
 
         changeset = Hr.Model.session_changeset(@model.__struct__, params)
-
         case Hr.UserHelper.authenticate_with_email_and_password(conn, changeset) do
           {:ok, user} ->
             conn

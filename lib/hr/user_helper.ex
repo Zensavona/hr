@@ -6,10 +6,6 @@ defmodule Hr.UserHelper do
   @model String.to_atom(Hr.Meta.model_module)
   @identity Hr.Meta.identity_model
 
-  def create(changeset) do
-    @repo.insert(changeset)
-  end
-
   def create_with_identity(identity) do
     identity = @repo.transaction fn ->
       user = @repo.insert!(@model.__struct__)
@@ -18,7 +14,7 @@ defmodule Hr.UserHelper do
       identity = @repo.insert!(identity)
     end
     {:ok, identity} = identity
-    identity |> HrDemo.Repo.preload(:owner) |> Map.fetch!(:owner)
+    identity |> @repo.preload(:owner) |> Map.fetch!(:owner)
   end
 
   def authenticate_with_identity(identity) do
@@ -26,13 +22,13 @@ defmodule Hr.UserHelper do
       nil ->
         {:error, nil}
       identity ->
-        user = identity |> HrDemo.Repo.preload(:owner) |> Map.fetch!(:owner)
+        user = identity |> @repo.preload(:owner) |> Map.fetch!(:owner)
         {:ok, user}
     end
   end
 
   def authenticate_with_email_and_password(conn, changeset) do
-    user = Hr.Repo.get_user(email: changeset.params["email"])
+    user = @repo.get_by(@model, email: changeset.params["email"])
     cond do
       user && checkpw(changeset.params["password"], user.password_hash) ->
         {:ok, user}

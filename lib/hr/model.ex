@@ -24,6 +24,30 @@ defmodule Hr.Model do
     |> put_pass_hash
   end
 
+  def confirmation_changeset(user = %{confirmed_at: nil}, params) do
+    cast(user, params, [])
+    |> put_change(:unconfirmed_email, nil)
+    |> put_change(:confirmed_at, Ecto.DateTime.local)
+    |> validate_token
+  end
+  def confirmation_changeset(user = %{unconfirmed_email: unconfirmed_email}, params) when unconfirmed_email != nil do
+    cast(user, params, [])
+    |> put_change(:hashed_confirmation_token, nil)
+    |> put_change(:unconfirmed_email, nil)
+    |> put_change(:email, unconfirmed_email)
+    |> validate_token
+  end
+
+  defp validate_token(changeset) do
+    token_matches = changeset.model.confirmation_token == changeset.params["confirmation_token"]
+    do_validate_token token_matches, changeset
+  end
+
+  defp do_validate_token(true, changeset), do: changeset
+  defp do_validate_token(false, changeset) do
+    add_error changeset, :confirmation_token, :invalid
+  end
+
   defp unvalidate_email(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{email: email}} ->
