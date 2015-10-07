@@ -24,11 +24,13 @@ defmodule Hr.BaseFormController do
         application = Hr.Meta.app_name(conn)
         path = application.Router.Helpers.unquote(:"#{Hr.Meta.model}_signup_path")(conn, :create_signup)
 
-        changeset = Hr.Model.signup_changeset(@model.__struct__, params)
+
+        {changeset, token} = Hr.Model.signup_changeset(@model.__struct__, params)
         case @repo.insert(changeset) do
           {:ok, user} ->
+            link = Hr.Meta.confirmation_url(conn, user.id, token)
+            Hr.MailHelper.send_confirmation_email(user, link)
             conn
-            |> Hr.Session.login(user)
             |> put_flash(:info, Hr.Messages.signed_up_but_unconfirmed)
             |> redirect(to: Hr.Meta.signed_up_url)
           {:error, changeset} ->

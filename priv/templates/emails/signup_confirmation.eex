@@ -1,0 +1,4 @@
+Hey <%= user.unconfirmed_email %>
+
+Click this:
+<%= link %>

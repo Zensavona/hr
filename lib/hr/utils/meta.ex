@@ -71,4 +71,12 @@ defmodule Hr.Meta do
   def identity_model(conn) do
     Module.concat(app_name(conn), "Identity")
   end
+
+  def confirmation_url(conn, id, token) do
+    url = conn.private.phoenix_endpoint.config(:url)
+    http = conn.private.phoenix_endpoint.config(:http)
+    port = if http[:port] != "80", do: ":#{http[:port]}", else: ""
+
+    "http://#{url[:host]}#{port}/new_#{Hr.Meta.model}_confirmation?id=#{id}&confirmation_token=#{token}"
+  end
 end

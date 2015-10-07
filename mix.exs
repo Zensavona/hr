@@ -36,7 +36,8 @@ defmodule Hr.Mixfile do
       {:plug, "~> 1.0"},
       {:comeonin, "~> 1.0"},
       {:oauth2, "~> 0.3.0"},
-      {:yyid, "~> 0.1"}
+      {:yyid, "~> 0.1"},
+      {:mailgun, "~> 0.1.2"}
     ]
   end
 end
