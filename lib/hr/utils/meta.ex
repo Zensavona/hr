@@ -9,6 +9,13 @@ defmodule Hr.Meta do
     variations[:scoped] # get rid of the Elixir.?
   end
 
+  def identity_model do
+    variations = Mix.Phoenix.inflect(to_string(Application.get_env(:hr, :model)))
+    [ _, app | _ ] = String.split(variations[:module], ".")
+
+    Module.concat(app, "Identity")
+  end
+
   def app_name(conn) do
     conn.private.phoenix_endpoint.config(:otp_app)
     |> to_string
@@ -51,5 +58,17 @@ defmodule Hr.Meta do
 
   def password_recovery_from_email do
     Application.get_env(:hr, :password_recovery_from_email)
+  end
+
+  def oauth_strategies do
+    Application.get_env(:hr, :oauth) || []
+  end
+
+  def valid_oauth_provider(provider) do
+    Enum.member?(Hr.Meta.oauth_strategies, String.to_atom(provider))
+  end
+
+  def identity_model(conn) do
+    Module.concat(app_name(conn), "Identity")
   end
 end

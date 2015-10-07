@@ -15,7 +15,7 @@ defmodule Hr.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :phoenix, :phoenix_html]]
+    [applications: [:logger, :phoenix, :phoenix_html, :oauth2]]
   end
 
   # Dependencies can be Hex packages:
@@ -34,7 +34,8 @@ defmodule Hr.Mixfile do
       {:phoenix_ecto, "~> 1.1"},
       {:yomel, "~> 0.2.2"},
       {:plug, "~> 1.0"},
-      {:comeonin, "~> 1.0"}
+      {:comeonin, "~> 1.0"},
+      {:oauth2, "~> 0.3.0"}
     ]
   end
 end

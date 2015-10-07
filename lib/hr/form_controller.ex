@@ -7,6 +7,7 @@ defmodule Hr.BaseFormController do
       use Phoenix.Controller
 
       @model unquote(String.to_atom(Hr.Meta.model_module))
+      @identity Hr.Meta.identity_model
 
       @doc """
         Entry point for registering new users.
@@ -26,7 +27,7 @@ defmodule Hr.BaseFormController do
 
         changeset = Hr.Model.signup_changeset(@model.__struct__, params)
 
-        case Hr.Repo.insert(changeset) do
+        case Hr.UserHelper.create(changeset) do
           {:ok, user} ->
             conn
             |> Hr.Session.login(user)
@@ -72,6 +73,42 @@ defmodule Hr.BaseFormController do
         conn
         |> Hr.Session.logout
         |> redirect(to: Hr.Meta.logged_out_url)
+      end
+
+      def oauth_authorize(conn, %{"provider" => provider}) do
+        case Hr.Meta.valid_oauth_provider(provider) do
+          true ->
+            url = Hr.OAuth.Strategies.find(provider).authorize_url!
+            redirect(conn, external: url)
+          _ ->
+            # error
+        end
+      end
+
+      def oauth_callback(conn, %{"provider" => provider, "code" => code}) do
+        case Hr.Meta.valid_oauth_provider(provider) do
+          true ->
+            strategy = Hr.OAuth.Strategies.find(provider)
+            identity = strategy.get_identity!(strategy.get_token!(code: code))
+
+            # if this OAuth id has a user associated with them,
+            # log them in, else create one
+            case Hr.UserHelper.authenticate_with_identity(identity) do
+              {:ok, user} ->
+                conn
+                |> Hr.Session.login(user)
+                |> put_flash(:info, Hr.Messages.signed_in_successfully)
+                |> redirect(to: Hr.Meta.logged_in_url)
+              {:error, _} ->
+                user = Hr.UserHelper.create_with_identity(identity)
+                conn
+                |> Hr.Session.login(user)
+                |> put_flash(:info, Hr.Messages.signed_in_successfully)
+                |> redirect(to: Hr.Meta.logged_in_url)
+            end
+          _ ->
+            # error
+        end
       end
 
       defoverridable Module.definitions_in(__MODULE__)
