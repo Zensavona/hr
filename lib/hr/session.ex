@@ -1,6 +1,5 @@
 defmodule Hr.Session do
   import Plug.Conn
-  import Comeonin.Bcrypt, only: [checkpw: 2]
 
   def login(conn, user) do
     conn
@@ -10,22 +9,10 @@ defmodule Hr.Session do
     |> configure_session(renew: true)
   end
 
-  def authenticate_with_email_and_password(conn, changeset) do
-    user = Hr.Repo.get_user(email: changeset.params["email"])
-    cond do
-      user && checkpw(changeset.params["password"], user.password_hash) ->
-        {:ok, user}
-      user ->
-        {:error, :unauthorized, conn}
-      true ->
-        {:error, :not_found, conn}
-    end
-  end
-
   def logout(conn) do
     configure_session(conn, drop: true)
   end
-  
+
 end
 
 defmodule Hr.UseSessions do

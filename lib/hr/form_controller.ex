@@ -1,11 +1,9 @@
 defmodule Hr.BaseFormController do
   @moduledoc """
    """
-
   defmacro __using__(_) do
     quote do
       use Phoenix.Controller
-
       @model unquote(String.to_atom(Hr.Meta.model_module))
       @identity Hr.Meta.identity_model
 
@@ -55,7 +53,7 @@ defmodule Hr.BaseFormController do
 
         changeset = Hr.Model.session_changeset(@model.__struct__, params)
 
-        case Hr.Session.authenticate_with_email_and_password(conn, changeset) do
+        case Hr.UserHelper.authenticate_with_email_and_password(conn, changeset) do
           {:ok, user} ->
             conn
             |> Hr.Session.login(user)
@@ -90,7 +88,6 @@ defmodule Hr.BaseFormController do
           true ->
             strategy = Hr.OAuth.Strategies.find(provider)
             identity = strategy.get_identity!(strategy.get_token!(code: code))
-
             # if this OAuth id has a user associated with them,
             # log them in, else create one
             case Hr.UserHelper.authenticate_with_identity(identity) do

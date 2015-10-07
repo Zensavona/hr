@@ -18,6 +18,6 @@ defmodule <%= base %>.Repo.Migrations.CreateIdentity do
       timestamps
     end
     create index(:<%= plural %>, [:owner_id])
-
+    create unique_index(:identities, [:uid, :provider])
   end
 end
