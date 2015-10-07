@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Phoenix.Gen.Hr.Model do
+defmodule Mix.Tasks.Hr.Gen.Model do
   use Mix.Task
 
   @shortdoc "Generates a Ecto model preconfigured for HR"
@@ -83,12 +83,13 @@ defmodule Mix.Tasks.Phoenix.Gen.Hr.Model do
 
     # remove email, password_hash, confirmation_token, password_recovery_token
     disallowed = [:email, :email_address, :password, :password_hash,
-                  :confirmation_token, :password_recovery_token, :password_reset_token]
-    hr_attrs = [email: :string, password_hash: :string, confirmation_token: :string,
-                password_reset_token: :string]
+                  :confirmation_token, :password_recovery_token, :password_reset_token, :unconfirmed_email, :confirmed_at, :confirmation_sent_at, :reset_password_sent_at, :failed_attempts, :locked_at]
+
+
+
     attrs = Enum.filter(attrs, fn({k, v}) -> !Enum.member?(disallowed, k) end)
 
-    attrs = attrs ++ hr_attrs
+    attrs = attrs
 
     binding   = Mix.Phoenix.inflect(singular)
     params    = Mix.Phoenix.params(attrs)
@@ -99,11 +100,7 @@ defmodule Mix.Tasks.Phoenix.Gen.Hr.Model do
 
     {assocs, attrs} = partition_attrs_and_assocs(attrs)
 
-    # create unique indexes for HR stuff
     indexes = indexes(plural, assocs)
-    indexes = indexes ++ ["create unique_index(:#{plural}, [:email])",
-                          "create unique_index(:#{plural}, [:confirmation_token])",
-                          "create unique_index(:#{plural}, [:password_reset_token])"]
 
     binding = binding ++
               [attrs: attrs, plural: plural, types: types(attrs),

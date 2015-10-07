@@ -35,7 +35,8 @@ defmodule Hr.Mixfile do
       {:yomel, "~> 0.2.2"},
       {:plug, "~> 1.0"},
       {:comeonin, "~> 1.0"},
-      {:oauth2, "~> 0.3.0"}
+      {:oauth2, "~> 0.3.0"},
+      {:yyid, "~> 0.1"}
     ]
   end
 end

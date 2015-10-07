@@ -5,6 +5,17 @@ defmodule <%= module %> do
 <%= for {k, _} <- attrs do %>    field <%= inspect k %>, <%= inspect types[k] %><%= defaults[k] %>
 <% end %>
     field :password, :string, virtual: :true
+    field :email, :string
+    field :unconfirmed_email, :string
+    field :password_hash, :string
+    field :confirmation_token, :string
+    field :confirmed_at, Ecto.DateTime
+    field :confirmation_sent_at, Ecto.DateTime
+    field :password_reset_token, :string
+    field :reset_password_sent_at, Ecto.DateTime
+    field :failed_attempts, :integer, default: 0
+    field :locked_at, Ecto.DateTime
+    has_one :identity, <%= base %>.Identity
 <%= for {k, _, m, _} <- assocs do %>    belongs_to <%= inspect k %>, <%= m %>
 <% end %>
     timestamps

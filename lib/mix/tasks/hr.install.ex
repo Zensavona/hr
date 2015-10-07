@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Phoenix.Gen.Hr.Install do
+defmodule Mix.Tasks.Hr.Install do
   use Mix.Task
 
   @shortdoc "Generates HR's config file and migrations"
