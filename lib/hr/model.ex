@@ -8,6 +8,8 @@ defmodule Hr.Model do
     |> validate_format(:email, ~r/@/) # replace this with something more robust
     |> unique_constraint(:email)
     |> validate_length(:password, min: 6, max: 100)
+    |> unvalidate_email
+    |> add_confirmation_token
     |> put_pass_hash
   end
 
@@ -20,6 +22,20 @@ defmodule Hr.Model do
     model
     |> cast(params, @required)
     |> put_pass_hash
+  end
+
+  defp unvalidate_email(changeset) do
+    case changeset do
+      %Ecto.Changeset{valid?: true, changes: %{email: email}} ->
+        changeset = put_change(changeset, :email, nil)
+        put_change(changeset, :unconfirmed_email, email)
+      _ ->
+        changeset
+    end
+  end
+
+  defp add_confirmation_token(changeset) do
+    put_change(changeset, :confirmation_token, YYID.new)
   end
 
   defp put_pass_hash(changeset) do
