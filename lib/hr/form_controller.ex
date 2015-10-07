@@ -68,6 +68,12 @@ defmodule Hr.BaseFormController do
         end
       end
 
+      def destroy_session(conn, _) do
+        conn
+        |> Hr.Session.logout
+        |> redirect(to: Hr.Meta.logged_out_url)
+      end
+
       defoverridable Module.definitions_in(__MODULE__)
     end
   end
