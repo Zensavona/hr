@@ -27,15 +27,15 @@ defmodule Hr.UserHelper do
     end
   end
 
-  def authenticate_with_email_and_password(conn, changeset) do
-    user = @repo.get_by(@model, email: changeset.params["email"])
+  def authenticate_with_email_and_password(model, repo, email, password) do
+    user = repo.get_by(model, email: email)
     cond do
-      user && checkpw(changeset.params["password"], user.password_hash) ->
+      user && checkpw(password, user.password_hash) ->
         {:ok, user}
       user ->
-        {:error, :unauthorized, conn}
+        {:error, :unauthorized}
       true ->
-        {:error, :not_found, conn}
+        {:error, :not_found}
     end
   end
 

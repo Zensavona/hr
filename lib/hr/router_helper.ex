@@ -1,11 +1,36 @@
-defmodule Hr.RoutesHelper do
+defmodule Hr.RouterHelper do
   defmacro __using__(_) do
     quote do
-      import Hr.RoutesHelper
+      import Hr.RouterHelper
+      import Hr.Plug
     end
   end
 
-  defmacro hr(:routes, options \\ %{}) do
+  defmacro hr_routes_for(entity, options \\ %{}) do
+    # helper, path, function, controller, method
+    routes = %{
+      new_signup: %{helper: :"new_#{entity}_signup", path: "/#{entity}/new", controller: Hr.AccountsController, function: :new_signup, method: :get},
+
+      create_signup: %{helper: :"create_#{entity}_signup", path: "/#{entity}/new", controller: Hr.AccountsController, function: :create_signup, method: :post},
+
+      new_session: %{helper: :"new_#{entity}_session", path: "/login", controller: Hr.SessionController, function: :new_session, method: :get},
+
+      create_session: %{helper: :"create_#{entity}_session", path: "/login", controller: Hr.SessionController, function: :new_session, method: :post}
+    }
+
+    for route <- routes do
+      {_, route} = route
+
+      quote do
+        unquote(route.method)(unquote(route.path),
+          unquote(route.controller),
+          unquote(route.function),
+          as: unquote(route.helper))
+      end
+    end
+  end
+
+  defmacro hr(:route_s, options \\ %{}) do
     name = Hr.Meta.model
 
     # routes = [

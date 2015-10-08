@@ -1,11 +1,10 @@
 defmodule Hr.Session do
   import Plug.Conn
 
-  def login(conn, user) do
+  def login(conn, entity, user) do
     conn
-    |> assign(:current_user, user)
-    |> put_private(:hr_user_id, user.id)
-    |> put_session(:hr_user_id, user.id)
+    |> assign(:"current_#{entity}", user)
+    |> put_session(:"hr_#{entity}_id", user.id)
     |> configure_session(renew: true)
   end
 

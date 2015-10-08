@@ -1,5 +1,15 @@
 defmodule Hr.Meta do
 
+  def stuff(conn) do
+    entity = to_string(conn.private.hr_entity)
+    variations = Mix.Phoenix.inflect(entity)
+    app = String.to_atom(app_name(conn))
+    model = Module.concat(app, variations[:scoped])
+    repo = Module.concat(app, "Repo")
+
+    {entity, model, repo, app}
+  end
+
   def model do
     Mix.Phoenix.inflect(to_string(Application.get_env(:hr, :model)))[:singular]
   end
