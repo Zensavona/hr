@@ -8,19 +8,37 @@ defmodule Hr.RoutesHelper do
   defmacro hr(:routes, options \\ %{}) do
     name = Hr.Meta.model
 
+    # routes = [
+    #             [:"new_#{name}_signup", :new_signup, :get],
+    #             [:"#{name}_signup", :create_signup, :post],
+    #             [:"new_#{name}_session", :new_session, :get],
+    #             [:"#{name}_session", :create_session, :post],
+    #             [:"destroy_#{name}_session", :destroy_session, :delete],
+    #             [:"#{name}_oauth_authorize/:provider", :oauth_authorize, :get],
+    #             [:"#{name}_oauth_callback/:provider", :oauth_callback, :get],
+    #             [:"new_#{name}_confirmation", :new_confirmation, :get],
+    #             [:"#{name}_confirmation", :create_confirmation, :post],
+    #             [:"new_#{name}_password_reset", :new_password_reset, :get],
+    #             [:"#{name}_password_reset", :create_password_reset, :post]
+    #          ]
+
     routes = [
-                [:"new_#{name}_signup", :new_signup, :get],
-                [:"#{name}_signup", :create_signup, :post],
-                [:"new_#{name}_session", :new_session, :get],
-                [:"#{name}_session", :create_session, :post],
-                [:"destroy_#{name}_session", :destroy_session, :delete],
-                [:"#{name}_oauth_authorize/:provider", :oauth_authorize, :get],
-                [:"#{name}_oauth_callback/:provider", :oauth_callback, :get],
-                [:"new_#{name}_confirmation", :new_confirmation, :get],
-                [:"#{name}_confirmation", :create_confirmation, :post],
-                [:"new_#{name}_password_reset", :new_password_reset, :get],
-                [:"#{name}_password_reset", :create_password_reset, :post]
-             ]
+                 [:"new_#{name}_signup", :new_signup, :get],
+                 [:"#{name}_signup", :create_signup, :post],
+                 [:"new_#{name}_session", :new_session, :get],
+                 [:"#{name}_session", :create_session, :post],
+                 [:"destroy_#{name}_session", :destroy_session, :delete],
+                 [:"#{name}_oauth_authorize/:provider", :oauth_authorize, :get],
+                 [:"#{name}_oauth_callback/:provider", :oauth_callback, :get],
+                 [:"new_#{name}_confirmation", :new_confirmation, :get],
+                 [:"#{name}_confirmation", :create_confirmation, :post],
+                 [:"new_#{name}_password_reset_request", :new_password_reset_request, :get],
+                 [:"#{name}_password_reset_request", :create_password_reset_request, :post],
+                 [:"new_#{name}_password_reset", :new_password_reset, :get],
+                 [:"#{name}_password_reset", :create_password_reset, :post]
+              ]
+
+
 
     for route <- routes do
       [name, action, method] = route

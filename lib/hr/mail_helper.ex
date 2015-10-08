@@ -12,4 +12,11 @@ defmodule Hr.MailHelper do
                subject: "hello!",
                html: EEx.eval_file(@path <> "signup_confirmation.eex", [user: user, link: link])
   end
+
+  def send_reset_email(user, link) do
+    send_email to: user.unconfirmed_email,
+               from: Application.get_env(:hr, :password_recovery_from_email),
+               subject: "hello!",
+               html: EEx.eval_file(@path <> "password_reset.eex", [user: user, link: link])
+  end
 end

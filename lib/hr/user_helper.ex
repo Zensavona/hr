@@ -38,4 +38,14 @@ defmodule Hr.UserHelper do
         {:error, :not_found, conn}
     end
   end
+
+  def get_with_id_and_token(id, token) do
+    user = @repo.get_by(@model, id: id)
+    cond do
+      user && checkpw(token, user.password_reset_token) ->
+        {:ok, user}
+      true ->
+        {:error, "Invalid token or user id"}
+    end
+  end
 end

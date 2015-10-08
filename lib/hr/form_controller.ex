@@ -125,6 +125,65 @@ defmodule Hr.BaseFormController do
         end
       end
 
+      def new_password_reset_request(conn, _) do
+        application = Hr.Meta.app_name(conn)
+        path = application.Router.Helpers.unquote(:"#{Hr.Meta.model}_password_reset_request_path")(conn, :create_password_reset_request)
+
+        conn
+        |> put_layout({application.LayoutView, :app})
+        |> render("password_reset_request.html", changeset: @model.changeset(@model.__struct__), path: path)
+      end
+
+      def create_password_reset_request(conn, %{unquote(Hr.Meta.model) => params}) do
+        user = @repo.get_by! @model, email: params["email"]
+        case user do
+          nil ->
+            nil
+          user ->
+            {changeset, token} = Hr.Model.reset_changeset(user)
+            @repo.update!(changeset)
+            link = Hr.Meta.reset_url(conn, user.id, token)
+            Hr.MailHelper.send_reset_email(user, link)
+        end
+        conn
+        |> put_flash(:info, "An email has been sent with further instructions.")
+        |> redirect(to: Hr.Meta.signed_up_url)
+      end
+
+      def new_password_reset(conn, %{"id" => id, "password_reset_token" => token} = params) do
+        application = Hr.Meta.app_name(conn)
+        path = application.Router.Helpers.unquote(:"#{Hr.Meta.model}_password_reset_path")(conn, :create_password_reset)
+
+        conn
+        |> put_layout({application.LayoutView, :app})
+        |> render("password_reset.html", changeset: Ecto.Changeset.cast(@model.__struct__, %{id: id, password_reset_token: token}, ~w(id password_reset_token)), path: path)
+      end
+
+      def create_password_reset(conn, %{unquote(Hr.Meta.model) => params}) do
+        application = Hr.Meta.app_name(conn)
+        path = application.Router.Helpers.unquote(:"#{Hr.Meta.model}_password_reset_path")(conn, :create_password_reset)
+
+        case Hr.UserHelper.get_with_id_and_token(params["id"], params["password_reset_token"]) do
+          {:ok, user} ->
+            changeset = Hr.Model.new_password_changeset(user, params)
+            if changeset.valid? do
+              @repo.update!(changeset)
+              conn
+              |> put_flash(:success, "Password reset successfully.")
+              |> redirect(to: Hr.Meta.signed_up_url)
+            else
+              conn
+              |> put_flash(:error, "Invalid password")
+              |> put_layout({application.LayoutView, :app})
+              |> render("password_reset.html", changeset: changeset, path: path)
+            end
+          {:error, _} ->
+            conn
+            |> put_flash(:error, "Invalid token.")
+            |> redirect(to: Hr.Meta.signed_up_url)
+        end
+      end
+
       defoverridable Module.definitions_in(__MODULE__)
     end
   end

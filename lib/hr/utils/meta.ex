@@ -79,4 +79,12 @@ defmodule Hr.Meta do
 
     "http://#{url[:host]}#{port}/new_#{Hr.Meta.model}_confirmation?id=#{id}&confirmation_token=#{token}"
   end
+
+  def reset_url(conn, id, token) do
+    url = conn.private.phoenix_endpoint.config(:url)
+    http = conn.private.phoenix_endpoint.config(:http)
+    port = if http[:port] != "80", do: ":#{http[:port]}", else: ""
+
+    "http://#{url[:host]}#{port}/new_#{Hr.Meta.model}_password_reset?id=#{id}&password_reset_token=#{token}"
+  end
 end

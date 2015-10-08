@@ -41,6 +41,21 @@ defmodule Hr.Model do
     |> validate_token
   end
 
+  def reset_changeset(user) do
+    token = YYID.new
+    changeset = user
+    |> cast(%{}, [])
+    |> put_change(:password_reset_token, Comeonin.Bcrypt.hashpwsalt(token))
+
+    {changeset, token}
+  end
+
+  def new_password_changeset(user, params) do
+    cast(user, params, ~w(password password_reset_token))
+    |> put_pass_hash
+    |> put_change(:password_reset_token, nil)
+  end
+
   defp validate_token(changeset) do
     token_matches = Comeonin.Bcrypt.checkpw(changeset.params["confirmation_token"], changeset.model.confirmation_token)
     do_validate_token token_matches, changeset
