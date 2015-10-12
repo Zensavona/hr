@@ -52,6 +52,7 @@ defmodule Hr.Model do
 
   def new_password_changeset(user, params) do
     cast(user, params, ~w(password password_reset_token))
+    |> validate_length(:password, min: 6, max: 100)
     |> put_pass_hash
     |> put_change(:password_reset_token, nil)
   end

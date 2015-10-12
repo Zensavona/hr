@@ -100,4 +100,8 @@ defmodule Hr.Meta do
 
     "http://#{url[:host]}#{port}/new_#{entity}_password_reset?id=#{id}&password_reset_token=#{token}"
   end
+
+  def locale do
+    Application.get_env(:hr, :locale) 
+  end
 end
