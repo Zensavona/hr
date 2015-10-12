@@ -6,9 +6,39 @@ defmodule Hr.RouterHelper do
     end
   end
 
-  defmacro hr_routes_for(entity, options \\ %{}) do
+  @doc """
+  hr_routes_for :comrade #, %{new_signup: %{path: "/anus/new"}} OR %{new_signup: %{helper: :"anus_signup", path: "/anus/new", controller: Hr.FormController, function: :new_signup, method: :get}}
+  """
+  defmacro hr_routes_for(entity, options \\ {:%{}, [line: 35], []}) do
     # helper, path, function, controller, method
-    routes = %{
+
+    quote do
+      for route <- default_routes(unquote(entity)) do
+        {key, route} = route
+
+        route =
+        if Map.has_key? unquote(options), key do
+          Map.merge route, unquote(options)[key]
+        else
+          route
+        end
+
+        case route.method do
+          :post ->
+            post route.path, route.controller, route.function, as: route.helper
+          :get ->
+            get route.path, route.controller, route.function, as: route.helper
+          :put ->
+            put route.path, route.controller, route.function, as: route.helper
+          :delete ->
+            delete route.path, route.controller, route.function, as: route.helper
+        end
+      end
+    end
+  end
+
+  def default_routes(entity) do
+    %{
       new_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: Hr.FormController, function: :new_signup, method: :get},
 
       create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: Hr.FormController, function: :create_signup, method: :post},
@@ -34,16 +64,5 @@ defmodule Hr.RouterHelper do
 
       create_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: Hr.FormController, function: :create_password_reset, method: :post}
     }
-
-    for route <- routes do
-      {_, route} = route
-
-      quote do
-        unquote(route.method)(unquote(route.path),
-          unquote(route.controller),
-          unquote(route.function),
-          as: unquote(route.helper))
-      end
-    end
   end
 end
