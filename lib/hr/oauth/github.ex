@@ -1,30 +1,29 @@
 defmodule Hr.OAuth.GitHub do
   use OAuth2.Strategy
-  @identity Hr.Meta.identity_model
 
   # Public API
 
-  def new do
+  def new_for_entity(entity) do
     OAuth2.new([
       strategy: __MODULE__,
       client_id: Application.get_env(:hr, :github_client_id) || System.get_env("GITHUB_CLIENT_ID"),
       client_secret: Application.get_env(:hr, :github_client_secret) || System.get_env("GITHUB_CLIENT_SECRET"),
-      redirect_uri: "http://localhost:4000/#{Hr.Meta.model}_oauth_callback/github",
+      redirect_uri: "http://localhost:4000/#{entity}/oauth/github/callback",
       site: "https://api.github.com",
       authorize_url: "https://github.com/login/oauth/authorize",
       token_url: "https://github.com/login/oauth/access_token"
     ])
   end
 
-  def authorize_url!(params \\ []) do
-    new()
+  def authorize_url!(entity, params \\ []) do
+    new_for_entity(entity)
     |> put_param(:scope, "user")
     |> OAuth2.Client.authorize_url!(params)
   end
 
   # you can pass options to the underlying http library via `options` parameter
-  def get_token!(params \\ [], headers \\ [], options \\ []) do
-    OAuth2.Client.get_token!(new(), params, headers, options)
+  def get_token!(entity, params \\ [], headers \\ [], options \\ []) do
+    OAuth2.Client.get_token!(new_for_entity(entity), params, headers, options)
   end
 
   def get_identity!(token) do
@@ -42,7 +41,6 @@ defmodule Hr.OAuth.GitHub do
       image: user["avatar_url"],
       phone: nil
     }
-    struct(@identity, identity)
   end
 
   # Strategy Callbacks

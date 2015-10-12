@@ -2,27 +2,23 @@ defmodule Hr.UserHelper do
   import Ecto.Model
   import Comeonin.Bcrypt, only: [checkpw: 2]
 
-  @repo Hr.Meta.repo
-  @model String.to_atom(Hr.Meta.model_module)
-  @identity Hr.Meta.identity_model
-
-  def create_with_identity(identity) do
-    identity = @repo.transaction fn ->
-      user = @repo.insert!(@model.__struct__)
+  def create_with_identity(repo, identity_model, model, entity, identity) do
+    identity = repo.transaction fn ->
+      user = repo.insert!(model.__struct__)
       # Build an identity from the user model
-      identity = Map.put(identity, :owner_id, user.id)
-      identity = @repo.insert!(identity)
+      identity = Map.put(identity, :"#{entity}_id", user.id)
+      identity = repo.insert!(identity)
     end
     {:ok, identity} = identity
-    identity |> @repo.preload(:owner) |> Map.fetch!(:owner)
+    identity |> repo.preload(:"#{entity}") |> Map.fetch!(:"#{entity}")
   end
 
-  def authenticate_with_identity(identity) do
-    case @repo.get_by(@identity, [uid: identity.uid, provider: identity.provider]) do
+  def authenticate_with_identity(repo, model, entity, identity) do
+    case repo.get_by(model, [uid: identity.uid, provider: identity.provider]) do
       nil ->
         {:error, nil}
       identity ->
-        user = identity |> @repo.preload(:owner) |> Map.fetch!(:owner)
+        user = identity |> repo.preload(:"#{entity}") |> Map.fetch!(:"#{entity}")
         {:ok, user}
     end
   end
@@ -39,8 +35,8 @@ defmodule Hr.UserHelper do
     end
   end
 
-  def get_with_id_and_token(id, token) do
-    user = @repo.get_by(@model, id: id)
+  def get_with_id_and_token(repo, model, id, token) do
+    user = repo.get_by(model, id: id)
     cond do
       user && checkpw(token, user.password_reset_token) ->
         {:ok, user}
