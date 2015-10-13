@@ -10,10 +10,12 @@ defmodule Mix.Tasks.Hr.Install do
     variations = Mix.Phoenix.inflect(name)
 
     files = [
-      {:eex, "hr.exs", "config/hr.exs"}
+      {:eex, "hr.gen.install/hr.exs", "config/hr.exs"},
+      {:text, "emails/password_reset.eex", "web/templates/hr_email/password_reset.eex"},
+      {:text, "emails/signup_confirmation.eex", "web/templates/hr_email/signup_confirmation.eex"}
     ]
 
-    Mix.Phoenix.copy_from paths(), "priv/templates/hr.gen.install", "", variations, files
+    Mix.Phoenix.copy_from paths(), "priv/templates", "", variations, files
 
 
     logo = """

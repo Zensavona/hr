@@ -24,5 +24,5 @@ defmodule Hr.BaseMailHelper do
 end
 
 defmodule Hr.MailHelper do
-  use Hr.BaseMailHelper, "web/templates/emails/"
+  use Hr.BaseMailHelper, "web/templates/hr_email/"
 end
