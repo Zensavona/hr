@@ -10,7 +10,7 @@ defmodule Hr.BaseFormController do
       """
       def new_session(conn, _) do
         {entity, model, repo, app} = Hr.Meta.stuff(conn)
-
+        IO.inspect model.hr_behaviours
         # BAM!
         path = apply(app.Router.Helpers, :"#{entity}_session_path", [app.Endpoint, :create_session])
 

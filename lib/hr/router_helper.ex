@@ -12,8 +12,12 @@ defmodule Hr.RouterHelper do
   defmacro hr_routes_for(entity, options \\ {:%{}, [line: 35], []}) do
     # helper, path, function, controller, method
 
+    # lol
+    [_elixir, app, _router] = String.split(to_string(__CALLER__.module), ".")
+    model = Module.concat(app, String.capitalize(to_string(entity)))
+
     quote do
-      for route <- default_routes(unquote(entity)) do
+      for route <- default_routes(unquote(entity), unquote(model.hr_behaviours)) do
         {key, route} = route
 
         route =
@@ -37,32 +41,44 @@ defmodule Hr.RouterHelper do
     end
   end
 
-  def default_routes(entity) do
-    %{
-      new_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: Hr.FormController, function: :new_signup, method: :get},
-
-      create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: Hr.FormController, function: :create_signup, method: :post},
-
-      new_session: %{helper: :"#{entity}_session", path: "/#{entity}/login", controller: Hr.FormController, function: :new_session, method: :get},
-
-      create_session: %{helper: :"#{entity}_session", path: "/#{entity}/login", controller: Hr.FormController, function: :create_session, method: :post},
-
-      # generate helpers for each oauth provider?
-      oauth_authorize: %{helper: :"#{entity}_oauth", path: "/#{entity}/oauth/:provider", controller: Hr.FormController, function: :oauth_authorize, method: :get},
-
-      oauth_callback: %{helper: :"#{entity}_oauth", path: "/#{entity}/oauth/:provider/callback", controller: Hr.FormController, function: :oauth_callback, method: :get},
-
-      destroy_session: %{helper: :"#{entity}_session", path: "/#{entity}/logout", controller: Hr.FormController, function: :destroy_session, method: :delete},
-
-      confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/confirmation", controller: Hr.FormController, function: :confirmation, method: :get},
-
-      new_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: Hr.FormController, function: :new_password_reset_request, method: :get},
-
-      create_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: Hr.FormController, function: :create_password_reset_request, method: :post},
-
-      new_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: Hr.FormController, function: :new_password_reset, method: :get},
-
-      create_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: Hr.FormController, function: :create_password_reset, method: :post}
+  def default_routes(entity, behaviours) do
+    default = %{
+      destroy_session: %{helper: :"#{entity}_session", path: "/#{entity}/logout", controller: Hr.FormController, function: :destroy_session, method: :delete}
     }
+
+    behaviour_routes = %{
+      registerable: %{
+        new_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: Hr.FormController, function: :new_signup, method: :get},
+
+        create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: Hr.FormController, function: :create_signup, method: :post}
+      },
+      confirmable: %{
+        confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/confirmation", controller: Hr.FormController, function: :confirmation, method: :get}
+      },
+      database_authenticatable: %{
+        new_session: %{helper: :"#{entity}_session", path: "/#{entity}/login", controller: Hr.FormController, function: :new_session, method: :get},
+
+        create_session: %{helper: :"#{entity}_session", path: "/#{entity}/login", controller: Hr.FormController, function: :create_session, method: :post}
+      },
+      oauthable: %{
+        # generate helpers for each oauth provider?
+        oauth_authorize: %{helper: :"#{entity}_oauth", path: "/#{entity}/oauth/:provider", controller: Hr.FormController, function: :oauth_authorize, method: :get},
+
+        oauth_callback: %{helper: :"#{entity}_oauth", path: "/#{entity}/oauth/:provider/callback", controller: Hr.FormController, function: :oauth_callback, method: :get},
+      },
+      recoverable: %{
+        new_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: Hr.FormController, function: :new_password_reset_request, method: :get},
+
+        create_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: Hr.FormController, function: :create_password_reset_request, method: :post},
+
+        new_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: Hr.FormController, function: :new_password_reset, method: :get},
+
+        create_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: Hr.FormController, function: :create_password_reset, method: :post}
+      }
+    }
+
+    Enum.reduce(behaviours, default, fn(behaviour, acc) ->
+      Map.merge(acc, behaviour_routes[behaviour])
+    end)
   end
 end
