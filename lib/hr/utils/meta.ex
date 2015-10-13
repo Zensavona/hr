@@ -83,26 +83,17 @@ defmodule Hr.Meta do
   end
 
   def confirmation_url(conn, id, token) do
-    {entity, model, repo, app} = stuff(conn)
-    url = conn.private.phoenix_endpoint.config(:url)
-    http = conn.private.phoenix_endpoint.config(:http)
-    port = if http[:port] != "80", do: ":#{http[:port]}", else: ""
+    {entity, _model, _repo, app} = stuff(conn)
+    path = apply(app.Router.Helpers, :"#{entity}_confirmation_url", [app.Endpoint, :confirmation])
 
-    # path = app.Router.Helpers.create_signup_url(conn, :create_signup)
-    "http://#{url[:host]}#{port}/new_#{entity}_confirmation?id=#{id}&confirmation_token=#{token}"
+    path <> "?id=#{id}&confirmation_token=#{token}"
   end
 
   def reset_url(conn, id, token) do
-    {entity, model, repo, app} = stuff(conn)
-    url = conn.private.phoenix_endpoint.config(:url)
-    http = conn.private.phoenix_endpoint.config(:http)
-    port = if http[:port] != "80", do: ":#{http[:port]}", else: ""
+    {entity, _model, _repo, app} = stuff(conn)
+    path = apply(app.Router.Helpers, :"#{entity}_password_reset_url", [app.Endpoint, :create_password_reset])
 
-    "http://#{url[:host]}#{port}/new_#{entity}_password_reset?id=#{id}&password_reset_token=#{token}"
-  end
-
-  def locale do
-    Application.get_env(:hr, :locale)
+    path <> "?id=#{id}&password_reset_token=#{token}"
   end
 
   def form_view(app) do
