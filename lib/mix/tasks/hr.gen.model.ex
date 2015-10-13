@@ -42,13 +42,15 @@ defmodule Mix.Tasks.Hr.Gen.Model do
                binary_id: opts[:binary_id]]
 
     files = [
-      {:eex, "model.ex",       "web/models/#{path}.ex"},
+      {:eex, "model.ex", "web/models/#{path}.ex"},
+      {:eex, "model_identity.ex", "web/models/#{path}_identity.ex"},
       {:eex, "model_test.exs", "test/models/#{path}_test.exs"}
     ]
 
     if opts[:migration] != false do
       files =
-        [{:eex, "migration.exs", "priv/repo/migrations/#{timestamp()}_create_#{migration}.exs"}|files]
+        [{:eex, "migration.exs", "priv/repo/migrations/#{timestamp()<>to_string(1)}_create_#{migration}.exs"},
+         {:eex, "identities_migration.ex", "priv/repo/migrations/#{timestamp()}_create_#{migration}_identities.exs"}|files]
     end
 
     Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.hr.model", "", binding, files
