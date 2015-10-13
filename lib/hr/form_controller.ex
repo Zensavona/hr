@@ -16,6 +16,7 @@ defmodule Hr.BaseFormController do
 
         conn
         |> put_layout({app.LayoutView, :app})
+        |> put_view(Hr.Meta.form_view(app))
         |> render("session.html", path: path)
       end
 
@@ -36,6 +37,7 @@ defmodule Hr.BaseFormController do
             conn
             |> put_flash(:error, Hr.I18n.t!(Hr.Meta.locale, "sessions.invalid"))
             |> put_layout({app.LayoutView, :app})
+            |> put_view(Hr.Meta.form_view(app))
             |> render("session.html", path: path)
         end
       end
@@ -108,6 +110,7 @@ defmodule Hr.BaseFormController do
 
         conn
         |> put_layout({app.LayoutView, :app})
+        |> put_view(Hr.Meta.form_view(app))
         |> render("signup.html", changeset: model.changeset(model.__struct__), path: path)
       end
 
@@ -130,6 +133,7 @@ defmodule Hr.BaseFormController do
           {:error, changeset} ->
             conn
             |> put_layout({app.LayoutView, :app})
+            |> put_view(Hr.Meta.form_view(app))
             |> render("signup.html", changeset: changeset, path: path)
         end
       end
@@ -164,6 +168,7 @@ defmodule Hr.BaseFormController do
 
         conn
         |> put_layout({app.LayoutView, :app})
+        |> put_view(Hr.Meta.form_view(app))
         |> render("password_reset_request.html", path: path)
       end
 
@@ -197,6 +202,7 @@ defmodule Hr.BaseFormController do
 
         conn
         |> put_layout({app.LayoutView, :app})
+        |> put_view(Hr.Meta.form_view(app))
         |> render("password_reset.html", id: id, token: token, path: path)
       end
 
@@ -219,6 +225,7 @@ defmodule Hr.BaseFormController do
               conn
               |> put_layout({app.LayoutView, :app})
               |> put_flash(:error, Hr.I18n.t!(Hr.Meta.locale, "passwords.invalid"))
+              |> put_view(Hr.Meta.form_view(app))
               |> render("password_reset.html", changeset: changeset, id: params["id"], token: params["password_reset_token"], path: path)
             end
           {:error, _} ->

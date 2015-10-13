@@ -102,6 +102,14 @@ defmodule Hr.Meta do
   end
 
   def locale do
-    Application.get_env(:hr, :locale) 
+    Application.get_env(:hr, :locale)
+  end
+
+  def form_view(app) do
+    if Code.ensure_loaded? app.HrFormView do
+      app.HrFormView
+    else
+      Hr.FormView
+    end
   end
 end
