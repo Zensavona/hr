@@ -3,67 +3,56 @@ defmodule Mix.Tasks.Hr.Install do
 
   @shortdoc "Generates HR's config file and migrations"
 
-  def run(args) do
+  def run(_) do
 
-    if length(args) != 1 || length(Regex.run(~r/^[A-z]+$/i, List.first(args))) != 1 do
-      raise_with_help
-    end
-
-    name = List.first(args)
+    name = "HR"
 
     variations = Mix.Phoenix.inflect(name)
-    name =  Module.concat(Elixir, variations[:module])
-
-    if !Code.ensure_loaded?(name) do
-      raise_with_help
-    end
 
     files = [
       {:eex, "hr.exs", "config/hr.exs"}
     ]
 
-    Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.hr.config", "", variations, files
+    Mix.Phoenix.copy_from paths(), "priv/templates/hr.gen.install", "", variations, files
+
+
+    logo = """
+                .----------------.   .----------------.
+               | .--------------. | | .--------------. |
+               | |  ____  ____  | | | |  _______     | |
+               | | |_   ||   _| | | | | |_   __ \\    | |
+               | |   | |__| |   | | | |   | |__) |   | |
+               | |   |  __  |   | | | |   |  __ /    | |
+               | |  _| |  | |_  | | | |  _| |  \\ \\_  | |
+               | | |____||____| | | | | |____| |___| | |
+               | |              | | | |              | |
+               | '--------------' | | '--------------' |
+                '----------------'   '----------------'
+    """
+
+    heart = IO.ANSI.format([:magenta, :bright, "<3"], true)
+    file = IO.ANSI.format([:green, :bright, "import_config \"hr.exs\""], true)
+    logo = IO.ANSI.format([:magenta, :bright, logo], true)
 
     Mix.shell.info """
 
     ======================================================================
 
-                    .----------------. .----------------.
-                  | .--------------. | .--------------. |
-                  | |  ____  ____  | | |  _______     | |
-                  | | |_   ||   _| | | | |_   __  \   | |
-                  | |   | |__| |   | | |   | |__) |   | |
-                  | |   |  __  |   | | |   |  __ /    | |
-                  | |  _| |  | |_  | | |  _| |  \ \_  | |
-                  | | |____||____| | | | |____| |___| | |
-                  | |              | | |              | |
-                  | '--------------' | '--------------' |
-                  '----------------' '----------------'
+    #{logo}
 
-    Congratulations on your fine choice of authentication library, friend.
+      Congrats on your fine choice of authentication library, friend.
 
 
-    Instructions:
+      Instructions:
         1. add the following line to the end of your config/config.exs:
 
-                      --> import_config "hr.exs" <--
+                      --> #{file} <--
 
-        2. run the migration/s with `mix ecto.migrate`
-        3. Enjoy your easy life of not writing dumb authentication code <3
+        2. run `mix hr.gen.model [Singluar] [plural]` if you haven't
+           already (or follow the instructions to add HR to an existing
+           Model)
+        3. Enjoy your easy life of not writing dumb authentication code #{heart}
     ======================================================================
-    """
-  end
-
-  defp raise_with_help do
-    Mix.raise """
-
-
-    mix phoenix.gen.hr.install expects an argument which is a valid model name
-    to configure HR to use, for example:
-                                          mix phoenix.gen.hr.install User
-
-    If you haven't yet run `mix phoenix.gen.hr.model`, please do so before running
-    this task.
     """
   end
 

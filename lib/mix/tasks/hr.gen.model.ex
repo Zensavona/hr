@@ -53,7 +53,7 @@ defmodule Mix.Tasks.Hr.Gen.Model do
          {:eex, "identities_migration.ex", "priv/repo/migrations/#{timestamp()}_create_#{migration}_identities.exs"}|files]
     end
 
-    Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.hr.model", "", binding, files
+    Mix.Phoenix.copy_from paths(), "priv/templates/hr.gen.model", "", binding, files
 
     # Print any extra instruction given by parent generators
     Mix.shell.info opts[:instructions] || ""
@@ -84,10 +84,10 @@ defmodule Mix.Tasks.Hr.Gen.Model do
 
   defp raise_with_help do
     Mix.raise """
-    mix phoenix.gen.hr.model expects both singular and plural names
+    mix hr.gen.model expects both singular and plural names
     of the generated resource followed by any number of attributes:
 
-        mix phoenix.gen.hr.model User users name:string
+        mix hr.gen.model User users name:string
     """
   end
 
@@ -100,7 +100,7 @@ defmodule Mix.Tasks.Hr.Gen.Model do
         Phoenix generators expect the table to be given to #{key}:references.
         For example:
 
-            mix phoenix.gen.hr.model Comment comments body:text post_id:references:posts
+            mix hr.gen.model Comment comments body:text post_id:references:posts
         """
       _ ->
         false
