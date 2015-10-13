@@ -5,17 +5,17 @@ defmodule Mix.Tasks.Hr.Install do
 
   def run(_) do
 
-    name = "HR"
-
-    variations = Mix.Phoenix.inflect(name)
+    base = Mix.Phoenix.base
 
     files = [
-      {:eex, "hr.gen.install/hr.exs", "config/hr.exs"},
-      {:text, "emails/password_reset.eex", "web/templates/hr_email/password_reset.eex"},
-      {:text, "emails/signup_confirmation.eex", "web/templates/hr_email/signup_confirmation.eex"}
+      {:text, "templates/hr.gen.install/hr.exs", "config/hr.exs"},
+      {:eex, "templates/hr.gen.install/i18n.ex", "web/hr_i18n.ex"},
+      {:text, "static/hr_locales/en.exs", "config/hr_locales/en.exs"},
+      {:text, "templates/emails/password_reset.eex", "web/templates/hr_email/password_reset.eex"},
+      {:text, "templates/emails/signup_confirmation.eex", "web/templates/hr_email/signup_confirmation.eex"}
     ]
 
-    Mix.Phoenix.copy_from paths(), "priv/templates", "", variations, files
+    Mix.Phoenix.copy_from paths(), "priv", "", [base: base], files
 
 
     logo = """
