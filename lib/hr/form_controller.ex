@@ -10,7 +10,7 @@ defmodule Hr.BaseFormController do
       """
       def new_session(conn, _) do
         {entity, model, repo, app} = Hr.Meta.stuff(conn)
-        IO.inspect model.hr_behaviours
+
         # BAM!
         path = apply(app.Router.Helpers, :"#{entity}_session_path", [app.Endpoint, :create_session])
 
@@ -124,14 +124,28 @@ defmodule Hr.BaseFormController do
         path = apply(app.Router.Helpers, :"#{entity}_signup_path", [app.Endpoint, :create_signup])
 
         params = data[entity]
-        {changeset, token} = Hr.Model.signup_changeset(model.__struct__, params)
+        confirmable? = Enum.member? model.hr_behaviours, :confirmable
+
+        if confirmable? do
+          {changeset, token} = Hr.Model.confirmable_signup_changeset(model.__struct__, params)
+        else
+          changeset = Hr.Model.signup_changeset(model.__struct__, params)
+        end
+
         case repo.insert(changeset) do
           {:ok, user} ->
-            link = Hr.Meta.confirmation_url(conn, user.id, token)
-            Hr.MailHelper.send_confirmation_email(user, link)
-            conn
-            |> put_flash(:info, Hr.Meta.i18n(app, "registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
-            |> redirect(to: Hr.Meta.signed_up_url)
+            if confirmable? do
+              link = Hr.Meta.confirmation_url(conn, user.id, token)
+              Hr.MailHelper.send_confirmation_email(user, link)
+              conn
+              |> put_flash(:info, Hr.Meta.i18n(app, "registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
+              |> redirect(to: Hr.Meta.signed_up_url)
+            else
+              conn
+              |> Hr.Session.login(entity, user)
+              |> put_flash(:info, Hr.Meta.i18n(app, "sessions.signed_in"))
+              |> redirect(to: Hr.Meta.logged_in_url)
+            end
           {:error, changeset} ->
             conn
             |> put_layout({app.LayoutView, :app})
@@ -147,16 +161,16 @@ defmodule Hr.BaseFormController do
         {entity, model, repo, app} = Hr.Meta.stuff conn
 
         user = repo.get! model, user_id
-        changeset = Hr.Model.confirmation_changeset user, params
+        changeset = Hr.Model.confirmation_changeset(user, params)
 
-        if changeset.valid? do
+        if changeset && changeset.valid? do
           repo.update!(changeset)
           conn
-          |> put_flash(:info, Hr.Meta.i18n(app, "registrations.confirmed"))
+          |> put_flash(:info, Hr.Meta.i18n(app, "confirmations.confirmed"))
           |> redirect(to: Hr.Meta.signed_up_url)
         else
           conn
-          |> put_flash(:error, Hr.Meta.i18n(app, "registrations.invalid_confirmation_token"))
+          |> put_flash(:error, Hr.Meta.i18n(app, "confirmations.invalid_confirmation_token"))
           |> redirect(to: Hr.Meta.signed_up_url)
         end
       end

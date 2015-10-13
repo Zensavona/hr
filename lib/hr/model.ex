@@ -2,17 +2,26 @@ defmodule Hr.Model do
   import Ecto.Changeset
   @required ~w(email password)
 
-  def signup_changeset(model, params) do
+  def confirmable_signup_changeset(model, params) do
     token = YYID.new
     rtn = model
     |> cast(params, @required)
-    |> validate_format(:email, ~r/@/) # replace this with something more robust
+    |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
     |> validate_length(:password, min: 6, max: 100)
     |> unvalidate_email
     |> put_change(:confirmation_token, Comeonin.Bcrypt.hashpwsalt(token))
     |> put_pass_hash
     {rtn, token}
+  end
+
+  def signup_changeset(model, params) do
+    model
+    |> cast(params, @required)
+    |> validate_format(:email, ~r/@/)
+    |> unique_constraint(:email)
+    |> validate_length(:password, min: 6, max: 100)
+    |> put_pass_hash
   end
 
   def oauth_signup_changeset(model, params) do
@@ -39,6 +48,10 @@ defmodule Hr.Model do
     |> put_change(:email, user.unconfirmed_email)
     |> put_change(:confirmed_at, Ecto.DateTime.local)
     |> validate_token
+  end
+
+  def confirmation_changeset(_, _) do
+    nil
   end
 
   def reset_changeset(user) do
