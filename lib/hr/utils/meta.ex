@@ -112,4 +112,20 @@ defmodule Hr.Meta do
       Hr.FormView
     end
   end
+
+  def i18n(app, message) do
+    if Code.ensure_loaded? app.HrI18n do
+      app.HrI18n.t!(Hr.Meta.locale, message)
+    else
+      Hr.I18n.t!(Hr.Meta.locale, message)
+    end
+  end
+
+  def i18n(app, message, bindings) do
+    if Code.ensure_loaded? app.HrI18n do
+      app.HrI18n.t!(Hr.Meta.locale, message, bindings)
+    else
+      Hr.I18n.t!(Hr.Meta.locale, message, bindings)
+    end
+  end
 end

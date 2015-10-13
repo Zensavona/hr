@@ -31,11 +31,11 @@ defmodule Hr.BaseFormController do
           {:ok, user} ->
             conn
             |> Hr.Session.login(entity, user)
-            |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "sessions.signed_in"))
+            |> put_flash(:info, Hr.Meta.i18n(app, "sessions.signed_in"))
             |> redirect(to: Hr.Meta.logged_in_url)
           {:error, _reason} ->
             conn
-            |> put_flash(:error, Hr.I18n.t!(Hr.Meta.locale, "sessions.invalid"))
+            |> put_flash(:error, Hr.Meta.i18n(app, "sessions.invalid"))
             |> put_layout({app.LayoutView, :app})
             |> put_view(Hr.Meta.form_view(app))
             |> render("session.html", path: path)
@@ -46,9 +46,11 @@ defmodule Hr.BaseFormController do
       Destroy the session
       """
       def destroy_session(conn, _) do
+        {entity, model, repo, app} = Hr.Meta.stuff conn
+
         conn
         |> Hr.Session.logout
-        |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "sessions.signed_out"))
+        |> put_flash(:info, Hr.Meta.i18n(app, "sessions.signed_out"))
         |> redirect(to: Hr.Meta.logged_out_url)
       end
 
@@ -87,13 +89,13 @@ defmodule Hr.BaseFormController do
               {:ok, user} ->
                 conn
                 |> Hr.Session.login(entity, user)
-                |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "sessions.signed_in"))
+                |> put_flash(:info, Hr.Meta.i18n(app, "sessions.signed_in"))
                 |> redirect(to: Hr.Meta.logged_in_url)
               {:error, _} ->
                 user = Hr.UserHelper.create_with_identity(repo, identity_model, model, entity, identity)
                 conn
                 |> Hr.Session.login(entity, user)
-                |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "registrations.signed_up"))
+                |> put_flash(:info, Hr.Meta.i18n(app, "registrations.signed_up"))
                 |> redirect(to: Hr.Meta.logged_in_url)
             end
           _ ->
@@ -128,7 +130,7 @@ defmodule Hr.BaseFormController do
             link = Hr.Meta.confirmation_url(conn, user.id, token)
             Hr.MailHelper.send_confirmation_email(user, link)
             conn
-            |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
+            |> put_flash(:info, Hr.Meta.i18n(app, "registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
             |> redirect(to: Hr.Meta.signed_up_url)
           {:error, changeset} ->
             conn
@@ -150,11 +152,11 @@ defmodule Hr.BaseFormController do
         if changeset.valid? do
           repo.update!(changeset)
           conn
-          |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "registrations.confirmed"))
+          |> put_flash(:info, Hr.Meta.i18n(app, "registrations.confirmed"))
           |> redirect(to: Hr.Meta.signed_up_url)
         else
           conn
-          |> put_flash(:error, Hr.I18n.t!(Hr.Meta.locale, "registrations.invalid_confirmation_token"))
+          |> put_flash(:error, Hr.Meta.i18n(app, "registrations.invalid_confirmation_token"))
           |> redirect(to: Hr.Meta.signed_up_url)
         end
       end
@@ -189,7 +191,7 @@ defmodule Hr.BaseFormController do
             Hr.MailHelper.send_reset_email(user, link)
         end
         conn
-        |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "passwords.send_instructions"))
+        |> put_flash(:info, Hr.Meta.i18n(app, "passwords.send_instructions"))
         |> redirect(to: Hr.Meta.signed_up_url)
       end
 
@@ -219,18 +221,18 @@ defmodule Hr.BaseFormController do
             if changeset.valid? do
               repo.update!(changeset)
               conn
-              |> put_flash(:info, Hr.I18n.t!(Hr.Meta.locale, "passwords.updated"))
+              |> put_flash(:info, Hr.Meta.i18n(app, "passwords.updated"))
               |> redirect(to: Hr.Meta.signed_up_url)
             else
               conn
               |> put_layout({app.LayoutView, :app})
-              |> put_flash(:error, Hr.I18n.t!(Hr.Meta.locale, "passwords.invalid"))
+              |> put_flash(:error, Hr.Meta.i18n(app, "passwords.invalid"))
               |> put_view(Hr.Meta.form_view(app))
               |> render("password_reset.html", changeset: changeset, id: params["id"], token: params["password_reset_token"], path: path)
             end
           {:error, _} ->
             conn
-            |> put_flash(:error, Hr.I18n.t!(Hr.Meta.locale, "passwords.no_token"))
+            |> put_flash(:error, Hr.Meta.i18n(app, "passwords.no_token"))
             |> redirect(to: Hr.Meta.signed_up_url)
         end
       end
