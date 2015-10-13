@@ -119,4 +119,12 @@ defmodule Hr.Meta do
       Hr.I18n.t!(Hr.Meta.locale, message, bindings)
     end
   end
+
+  def mailer(app) do
+    if Code.ensure_loaded? app.HrMailHelper do
+      app.HrMailHelper
+    else
+      Hr.MailHelper
+    end
+  end
 end

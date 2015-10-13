@@ -136,7 +136,7 @@ defmodule Hr.BaseFormController do
           {:ok, user} ->
             if confirmable? do
               link = Hr.Meta.confirmation_url(conn, user.id, token)
-              Hr.MailHelper.send_confirmation_email(user, link)
+              Hr.Meta.mailer(app).send_confirmation_email(user, link)
               conn
               |> put_flash(:info, Hr.Meta.i18n(app, "registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
               |> redirect(to: Hr.Meta.signed_up_url)
@@ -202,7 +202,7 @@ defmodule Hr.BaseFormController do
             {changeset, token} = Hr.Model.reset_changeset(user)
             repo.update!(changeset)
             link = Hr.Meta.reset_url(conn, user.id, token)
-            Hr.MailHelper.send_reset_email(user, link)
+            Hr.Meta.mailer(app).send_reset_email(user, link)
         end
         conn
         |> put_flash(:info, Hr.Meta.i18n(app, "passwords.send_instructions"))
