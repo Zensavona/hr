@@ -1,5 +1,7 @@
 defmodule <%= module %> do
   use <%= base %>.Web, :model
+  use Hr.Behaviours, [:registerable, :database_authenticatable, :recoverable, :confirmable]
+  # optionally add :oauthable to authenticate <%= plural %> with the oauth providers you specify in config/hr.exs
 
   schema <%= inspect plural %> do
 <%= for {k, _} <- attrs do %>    field <%= inspect k %>, <%= inspect types[k] %><%= defaults[k] %>
@@ -15,7 +17,7 @@ defmodule <%= module %> do
     field :reset_password_sent_at, Ecto.DateTime
     field :failed_attempts, :integer, default: 0
     field :locked_at, Ecto.DateTime
-    has_one :identity, <%= base %>.Identity
+    has_many :<%= singular %>_identities, <%= base %>.<%= alias %>Identity
 <%= for {k, _, m, _} <- assocs do %>    belongs_to <%= inspect k %>, <%= m %>
 <% end %>
     timestamps

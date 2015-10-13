@@ -39,7 +39,7 @@ defmodule Hr.Meta do
   end
 
   def locale do
-    Application.get_env(:hr, :locale)
+    Application.get_env(:hr, :locale) || "en"
   end
 
   def repo do
