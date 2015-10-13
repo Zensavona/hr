@@ -32,7 +32,6 @@ defmodule Hr.Mixfile do
       {:phoenix, "~> 1.0"},
       {:phoenix_html, "~> 2.1"},
       {:phoenix_ecto, "~> 1.1"},
-      {:yomel, "~> 0.2.2"},
       {:plug, "~> 1.0"},
       {:comeonin, "~> 1.0"},
       {:oauth2, "~> 0.3.0"},
