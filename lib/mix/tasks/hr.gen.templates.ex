@@ -5,8 +5,6 @@ defmodule Mix.Tasks.Hr.Gen.Templates do
 
   def run(_) do
 
-    name = "HR"
-
     base = Mix.Phoenix.base
 
     files = [
