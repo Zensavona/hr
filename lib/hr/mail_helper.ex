@@ -16,7 +16,7 @@ defmodule Hr.BaseMailHelper do
         send_email to: user.unconfirmed_email,
                    from: Application.get_env(:hr, :register_from_email),
                    subject: Application.get_env(:hr, :confirmation_email_subject),
-                   html: EEx.eval_file(@dir <> "signup_confirmation.eex", [user: user, link: link])
+                   html: EEx.eval_file(unquote(dir) <> "signup_confirmation.eex", [user: user, link: link])
       end
 
       def send_reset_email(user, link) do
