@@ -5,7 +5,7 @@
   "httpoison": {:hex, :httpoison, "0.7.4"},
   "idna": {:hex, :idna, "1.0.2"},
   "linguist": {:hex, :linguist, "0.1.5"},
-  "mailgun": {:hex, :mailgun, "0.1.2"},
+  "mailgun": {:git, "https://github.com/Zensavona/mailgun.git", "2e55ad6716e93d7822016a2e7620073d78a116e6", [branch: "fix_config"]},
   "oauth2": {:hex, :oauth2, "0.3.0"},
   "phoenix": {:hex, :phoenix, "1.0.3"},
   "phoenix_ecto": {:hex, :phoenix_ecto, "1.2.0"},
