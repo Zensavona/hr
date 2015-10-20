@@ -29,7 +29,8 @@ defmodule Hr.OAuth.GitHub do
   def get_identity!(token) do
     user = OAuth2.AccessToken.get!(token, "/user")
     name = String.split(user["name"], " ") || [user["name"]]
-    identity = %{
+
+    %{
       uid: to_string(user["id"]),
       provider: __MODULE__ |> to_string |> String.split(".") |> List.last |> String.downcase,
       email: user["email"],
