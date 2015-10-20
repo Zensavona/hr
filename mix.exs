@@ -6,6 +6,7 @@ defmodule Hr.Mixfile do
      version: "0.0.1",
      elixir: "~> 1.0",
      compilers: [:phoenix] ++ Mix.compilers,
+     test_coverage: [tool: ExCoveralls],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -39,7 +40,10 @@ defmodule Hr.Mixfile do
       {:oauth2, "~> 0.3.0"},
       {:yyid, "~> 0.1"},
       {:mailgun, git: "https://github.com/Zensavona/mailgun.git", branch: "fix_config"},
-      {:linguist, "~> 0.1.5"}
+      {:linguist, "~> 0.1.5"},
+      {:ex_doc, "~> 0.10.0", only: [:dev, :docs]},
+      {:excoveralls, "~> 0.3", only: [:dev, :test]},
+      {:inch_ex, "~> 0.4.0", only: [:dev, :docs]}
     ]
   end
 end
