@@ -1,10 +1,16 @@
 defmodule Mix.Tasks.Hr.Gen.Templates do
+  @moduledoc """
+  Generates default templates into the parent application's
+  `web/template/hr_form` directory, customise them there.
+  """
   use Mix.Task
 
   @shortdoc "Generates HR templates for you to customise"
 
+  @doc """
+  Run the mix task and generate some stuff
+  """
   def run(_) do
-
     base = Mix.Phoenix.base
 
     files = [

@@ -1,5 +1,7 @@
 defmodule Hr.BaseFormController do
   @moduledoc """
+  Base form controller. Can be "inherited" from by using `use Hr.BaseFormController`.
+  A good example of this is in `Hr.FormController`
    """
   defmacro __using__(_) do
     quote do
@@ -255,5 +257,11 @@ defmodule Hr.BaseFormController do
 end
 
 defmodule Hr.FormController do
+  @moduledoc """
+  The default implementation of FormController. If you want to override
+  it, either direct your routes to your own implementation (if you want to
+  just override a couple of actions), or implement `YourApp.HrFormController`
+  with `use Hr.BaseFormController`.
+  """
   use Hr.BaseFormController
 end

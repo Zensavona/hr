@@ -1,8 +1,14 @@
 defmodule Mix.Tasks.Hr.Install do
+  @moduledoc """
+  Install HR. This generates a config file, i18n messages and email templates
+  """
   use Mix.Task
 
   @shortdoc "Generates HR's config file and migrations"
 
+  @doc """
+  Install HR's config file, email templates and i18n messages
+  """
   def run(_) do
 
     base = Mix.Phoenix.base

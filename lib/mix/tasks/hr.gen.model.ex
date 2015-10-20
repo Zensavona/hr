@@ -1,10 +1,16 @@
 defmodule Mix.Tasks.Hr.Gen.Model do
   @moduledoc """
+  Generate a model which is configured for use with HR. Contains
+  a default configuration, and a commented example of the capabilities
+  available to be "switched on"
   """
   use Mix.Task
 
   @shortdoc "Generates a Ecto model preconfigured for HR"
 
+  @doc """
+  Generate stuff
+  """
   def run(args) do
     switches = [migration: :boolean, binary_id: :boolean, instructions: :string]
 
