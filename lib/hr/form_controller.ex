@@ -12,10 +12,10 @@ defmodule Hr.BaseFormController do
         {entity, model, repo, app} = Hr.Meta.stuff(conn)
 
         # BAM!
-        path = apply(app.Router.Helpers, :"#{entity}_session_path", [app.Endpoint, :create_session])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_session_path", [Module.concat(app, Endpoint), :create_session])
 
         conn
-        |> put_layout({app.LayoutView, :app})
+        |> put_layout({Module.concat(app, LayoutView), :app})
         |> put_view(Hr.Meta.form_view(app))
         |> render("session.html", path: path)
       end
@@ -25,7 +25,7 @@ defmodule Hr.BaseFormController do
       """
       def create_session(conn, %{"session" => %{"email" => email, "password" => password}}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        path = apply(app.Router.Helpers, :"#{entity}_session_path", [app.Endpoint, :create_session])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_session_path", [Module.concat(app, Endpoint), :create_session])
 
         case Hr.UserHelper.authenticate_with_email_and_password(model, repo, email, password) do
           {:ok, user} ->
@@ -36,7 +36,7 @@ defmodule Hr.BaseFormController do
           {:error, _reason} ->
             conn
             |> put_flash(:error, Hr.Meta.i18n(app, "sessions.invalid"))
-            |> put_layout({app.LayoutView, :app})
+            |> put_layout({Module.concat(app, LayoutView), :app})
             |> put_view(Hr.Meta.form_view(app))
             |> render("session.html", path: path)
         end
@@ -108,10 +108,10 @@ defmodule Hr.BaseFormController do
       """
       def new_signup(conn, _) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        path = apply(app.Router.Helpers, :"#{entity}_signup_path", [app.Endpoint, :create_signup])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_signup_path", [Module.concat(app, Endpoint), :create_signup])
 
         conn
-        |> put_layout({app.LayoutView, :app})
+        |> put_layout({Module.concat(app, LayoutView), :app})
         |> put_view(Hr.Meta.form_view(app))
         |> render("signup.html", changeset: model.changeset(model.__struct__), path: path)
       end
@@ -121,7 +121,7 @@ defmodule Hr.BaseFormController do
       """
       def create_signup(conn, data) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        path = apply(app.Router.Helpers, :"#{entity}_signup_path", [app.Endpoint, :create_signup])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_signup_path", [Module.concat(app, Endpoint), :create_signup])
 
         params = data[entity]
         confirmable? = Enum.member? model.hr_behaviours, :confirmable
@@ -148,7 +148,7 @@ defmodule Hr.BaseFormController do
             end
           {:error, changeset} ->
             conn
-            |> put_layout({app.LayoutView, :app})
+            |> put_layout({Module.concat(app, LayoutView), :app})
             |> put_view(Hr.Meta.form_view(app))
             |> render("signup.html", changeset: changeset, path: path)
         end
@@ -180,10 +180,10 @@ defmodule Hr.BaseFormController do
       """
       def new_password_reset_request(conn, _) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        path = apply(app.Router.Helpers, :"#{entity}_password_reset_request_path", [app.Endpoint, :create_password_reset_request])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_password_reset_request_path", [Module.concat(app, Endpoint), :create_password_reset_request])
 
         conn
-        |> put_layout({app.LayoutView, :app})
+        |> put_layout({Module.concat(app, LayoutView), :app})
         |> put_view(Hr.Meta.form_view(app))
         |> render("password_reset_request.html", path: path)
       end
@@ -214,10 +214,10 @@ defmodule Hr.BaseFormController do
       """
       def new_password_reset(conn, %{"id" => id, "password_reset_token" => token}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        path = apply(app.Router.Helpers, :"#{entity}_password_reset_path", [app.Endpoint, :new_password_reset])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_password_reset_path", [Module.concat(app, Endpoint), :new_password_reset])
 
         conn
-        |> put_layout({app.LayoutView, :app})
+        |> put_layout({Module.concat(app, LayoutView), :app})
         |> put_view(Hr.Meta.form_view(app))
         |> render("password_reset.html", id: id, token: token, path: path)
       end
@@ -227,7 +227,7 @@ defmodule Hr.BaseFormController do
       """
       def create_password_reset(conn, %{"reset" => params}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        path = apply(app.Router.Helpers, :"#{entity}_password_reset_path", [app.Endpoint, :create_password_reset])
+        path = apply(Module.concat(app, Router.Helpers), :"#{entity}_password_reset_path", [Module.concat(app, Endpoint), :create_password_reset])
 
         case Hr.UserHelper.get_with_id_and_token(repo, model, params["id"], params["password_reset_token"]) do
           {:ok, user} ->
@@ -239,7 +239,7 @@ defmodule Hr.BaseFormController do
               |> redirect(to: Hr.Meta.signed_up_url)
             else
               conn
-              |> put_layout({app.LayoutView, :app})
+              |> put_layout({Module.concat(app, LayoutView), :app})
               |> put_flash(:error, Hr.Meta.i18n(app, "passwords.invalid"))
               |> put_view(Hr.Meta.form_view(app))
               |> render("password_reset.html", changeset: changeset, id: params["id"], token: params["password_reset_token"], path: path)
