@@ -84,45 +84,45 @@ defmodule Hr.Meta do
 
   def confirmation_url(conn, id, token) do
     {entity, _model, _repo, app} = stuff(conn)
-    path = apply(app.Router.Helpers, :"#{entity}_confirmation_url", [app.Endpoint, :confirmation])
+    path = apply(Module.concat(app, Router.Helpers), :"#{entity}_confirmation_url", [Module.concat(app, Endpoint), :confirmation])
 
     path <> "?id=#{id}&confirmation_token=#{token}"
   end
 
   def reset_url(conn, id, token) do
     {entity, _model, _repo, app} = stuff(conn)
-    path = apply(app.Router.Helpers, :"#{entity}_password_reset_url", [app.Endpoint, :create_password_reset])
+    path = apply(Module.concat(app, Router.Helpers), :"#{entity}_password_reset_url", [Module.concat(app, Endpoint), :create_password_reset])
 
     path <> "?id=#{id}&password_reset_token=#{token}"
   end
 
   def form_view(app) do
-    if Code.ensure_loaded? app.HrFormView do
-      app.HrFormView
+    if Code.ensure_loaded? Module.concat(app, HrFormView) do
+      Module.concat(app, HrFormView)
     else
       Hr.FormView
     end
   end
 
   def i18n(app, message) do
-    if Code.ensure_loaded? app.HrI18n do
-      app.HrI18n.t!(Hr.Meta.locale, message)
+    if Code.ensure_loaded? Module.concat(app, HrI18n) do
+      Module.concat(app, HrI18n).t!(Hr.Meta.locale, message)
     else
       Hr.I18n.t!(Hr.Meta.locale, message)
     end
   end
 
   def i18n(app, message, bindings) do
-    if Code.ensure_loaded? app.HrI18n do
-      app.HrI18n.t!(Hr.Meta.locale, message, bindings)
+    if Code.ensure_loaded? Module.concat(app, HrI18n) do
+      Module.concat(app, HrI18n).t!(Hr.Meta.locale, message, bindings)
     else
       Hr.I18n.t!(Hr.Meta.locale, message, bindings)
     end
   end
 
   def mailer(app) do
-    if Code.ensure_loaded? app.HrMailHelper do
-      app.HrMailHelper
+    if Code.ensure_loaded? Module.concat(app, HrMailHelper) do
+      Module.concat(app, HrMailHelper)
     else
       Hr.MailHelper
     end
