@@ -1,7 +1,14 @@
 defmodule Hr.Model do
+  @moduledoc """
+  Provides changesets for interacting with HRable models internally
+  """
   import Ecto.Changeset
   @required ~w(email password)
 
+  @doc """
+  takes raw input and returns a model+token tuple with an unconfirmed
+  email address and a hashed password.
+  """
   def confirmable_signup_changeset(model, params) do
     token = YYID.new
     rtn = model
