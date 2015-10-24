@@ -51,17 +51,17 @@ defmodule Hr.Mixfile do
 
   defp description do
     """
-    User accounts for Phoenix. Supports OAuth, JWT and forms out of the box 
+    User accounts for Phoenix. Supports OAuth, JWT and forms out of the box
     """
   end
 
   defp package do
     [
       licenses: ["MIT"],
-      keywords: ["Elixir", "Instagram", "instagram", "REST", "HTTP", "API", "Private", "naughty"],
+      keywords: ["Elixir", "Phoenix", "accounts", "authorisation", "authorization", "HTTP", "JWT", "Forms", "sessions", "users", "devise", "token"],
       maintainers: ["Zen Savona"],
-      links: %{"GitHub" => "https://github.com/zensavona/naughtygram",
-               "Docs" => "https://hexdocs.pm/naughtygram"}
+      links: %{"GitHub" => "https://github.com/zensavona/hr",
+               "Docs" => "https://hexdocs.pm/hr"}
     ]
   end
 end
