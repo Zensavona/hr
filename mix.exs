@@ -3,7 +3,7 @@ defmodule Hr.Mixfile do
 
   def project do
     [app: :hr,
-     version: "0.1.2",
+     version: "0.1.3",
      elixir: "~> 1.0",
      compilers: [:phoenix] ++ Mix.compilers,
      test_coverage: [tool: ExCoveralls],
@@ -60,8 +60,8 @@ defmodule Hr.Mixfile do
       licenses: ["MIT"],
       keywords: ["Elixir", "Phoenix", "accounts", "authorisation", "authorization", "HTTP", "JWT", "Forms", "sessions", "users", "devise", "token"],
       maintainers: ["Zen Savona"],
-      links: %{"On GitHub" => "https://github.com/zensavona/hr",
-               "Hexdocs" => "https://hexdocs.pm/hr"}
+      links: %{"GitHub" => "https://github.com/zensavona/hr",
+               "Docs" => "https://hexdocs.pm/hr"}
     ]
   end
 end
