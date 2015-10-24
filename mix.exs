@@ -3,10 +3,12 @@ defmodule Hr.Mixfile do
 
   def project do
     [app: :hr,
-     version: "0.0.1",
+     version: "0.1.0",
      elixir: "~> 1.0",
      compilers: [:phoenix] ++ Mix.compilers,
      test_coverage: [tool: ExCoveralls],
+     description: description,
+     package: package,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -44,6 +46,22 @@ defmodule Hr.Mixfile do
       {:ex_doc, "~> 0.10.0", only: [:dev, :docs]},
       {:excoveralls, "~> 0.3", only: [:dev, :test]},
       {:inch_ex, "~> 0.4.0", only: [:dev, :docs]}
+    ]
+  end
+
+  defp description do
+    """
+    User accounts for Phoenix. Supports OAuth, JWT and forms out of the box 
+    """
+  end
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      keywords: ["Elixir", "Instagram", "instagram", "REST", "HTTP", "API", "Private", "naughty"],
+      maintainers: ["Zen Savona"],
+      links: %{"GitHub" => "https://github.com/zensavona/naughtygram",
+               "Docs" => "https://hexdocs.pm/naughtygram"}
     ]
   end
 end
