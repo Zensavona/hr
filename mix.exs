@@ -3,7 +3,7 @@ defmodule Hr.Mixfile do
 
   def project do
     [app: :hr,
-     version: "0.1.4",
+     version: "0.2.0",
      elixir: "~> 1.0",
      compilers: [:phoenix] ++ Mix.compilers,
      test_coverage: [tool: ExCoveralls],
@@ -20,7 +20,7 @@ defmodule Hr.Mixfile do
   def application do
     [applications: [:logger, :phoenix, :phoenix_html, :oauth2,
                     :phoenix_ecto, :plug, :comeonin, :yyid,
-                    :mailgun, :linguist]]
+                    :mailgun, :linguist, :joken]]
   end
 
   # Dependencies can be Hex packages:
