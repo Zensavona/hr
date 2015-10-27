@@ -43,6 +43,7 @@ defmodule Hr.Mixfile do
       {:yyid, "~> 0.1"},
       {:mailgun, git: "https://github.com/Zensavona/mailgun.git", branch: "fix_config"},
       {:linguist, "~> 0.1.5"},
+      {:joken, "~> 0.16.1"},
       {:ex_doc, "~> 0.10.0", only: [:dev, :docs]},
       {:excoveralls, "~> 0.3", only: [:dev, :test]},
       {:inch_ex, "~> 0.4.0", only: [:dev, :docs]}

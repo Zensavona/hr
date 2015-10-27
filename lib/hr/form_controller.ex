@@ -26,6 +26,7 @@ defmodule Hr.BaseFormController do
       Check if the submitted credentials are valid, if they are, create a session
       """
       def create_session(conn, %{"session" => %{"email" => email, "password" => password}}) do
+        IO.inspect conn
         {entity, model, repo, app} = Hr.Meta.stuff conn
         path = apply(Module.concat(app, Router.Helpers), :"#{entity}_session_path", [Module.concat(app, Endpoint), :create_session])
 

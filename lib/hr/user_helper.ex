@@ -1,6 +1,7 @@
 defmodule Hr.UserHelper do
   import Ecto.Model
   import Comeonin.Bcrypt, only: [checkpw: 2]
+  import Joken
 
   def create_with_identity(repo, identity_model, model, entity, identity) do
     identity = repo.transaction fn ->
