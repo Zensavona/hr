@@ -3,7 +3,7 @@ defmodule Hr.Mixfile do
 
   def project do
     [app: :hr,
-     version: "0.2.0",
+     version: "0.2.1",
      elixir: "~> 1.0",
      compilers: [:phoenix] ++ Mix.compilers,
      test_coverage: [tool: ExCoveralls],
