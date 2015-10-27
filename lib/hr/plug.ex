@@ -41,9 +41,9 @@ defmodule Hr.Plug do
   end
 
   def authenticate_user(conn, _opts) do
-    IO.inspect conn.private.hr_auth_type
+    IO.inspect conn
     {_, _, _, app} = Hr.Meta.stuff conn
-    if Map.has_key?(conn.assigns, "current_user") && conn.assigns.current_user do
+    if Map.has_key?(conn.assigns, :current_user) && conn.assigns.current_user do
       conn
     else
       case conn.private.hr_auth_type do
