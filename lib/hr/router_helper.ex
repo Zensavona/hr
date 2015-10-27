@@ -106,6 +106,9 @@ defmodule Hr.RouterHelper do
         new_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: controller, function: :new_password_reset, method: :get},
 
         create_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: controller, function: :create_password_reset, method: :post}
+      },
+      jwt_refreshable: %{
+        create_refreshed_token: %{helper: :"#{entity}_token_refresh", path: "/#{entity}/refresh_token", controller: controller, function: :create_refreshed_token, method: :post}
       }
     }
 
