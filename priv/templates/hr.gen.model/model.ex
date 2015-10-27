@@ -2,6 +2,7 @@ defmodule <%= module %> do
   use <%= base %>.Web, :model
   use Hr.Behaviours, [:registerable, :database_authenticatable, :recoverable, :confirmable]
   # optionally add :oauthable to authenticate <%= plural %> with the oauth providers you specify in config/hr.exs
+  # optionally add :jwt_refreshable if you are using JWT token auth and want to refresh your tokens on an interval
 
   schema <%= inspect plural %> do
 <%= for {k, _} <- attrs do %>    field <%= inspect k %>, <%= inspect types[k] %><%= defaults[k] %>
