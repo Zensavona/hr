@@ -4,11 +4,28 @@ defmodule Hr.JWT do
   """
   import Joken
 
-  def create(entity, user) do
+  def create(conn, entity, user) do
     %{email: user.email, id: user.id, entity: to_string(entity)}
     |> token
-    |> with_signer(hs256("my_secret"))
+    |> with_signer(hs256(conn.secret_key_base))
     |> sign
     |> get_compact
+  end
+
+  def refresh(conn, stale_token) do
+    decoded = stale_token |> token |> with_signer(hs256(conn.secret_key_base)) |> verify
+
+    case decoded do
+      %{error: nil} ->
+        fresh = %{email: decoded.claims["email"], id: decoded.claims["id"], entity: decoded.claims["entity"]}
+        |> token
+        |> with_signer(hs256(conn.secret_key_base))
+        |> sign
+        |> get_compact
+
+        {:ok, fresh}
+      _ ->
+        {:error, decoded.error}
+    end
   end
 end
