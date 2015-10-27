@@ -38,6 +38,10 @@ defmodule Hr.JWTView do
     %{token: token}
   end
 
+  def render("generic_flash.json", %{flash: message}) do
+    %{flash: message}
+  end
+
   def render("error.json", %{errors: errors}) do
     %{errors: errors}
   end
