@@ -25,8 +25,13 @@ defmodule Hr.Plug do
 
     case get_req_header(conn, "authorization") do
       [auth] ->
-        # |> with_validation("user_id", &(&1 == 21)) ?
-        auth = auth |> token |> with_signer(hs256(conn.secret_key_base)) |> verify
+
+        auth = auth
+        |> String.split(" ")
+        |> List.last
+        |> token
+        |> with_signer(hs256(conn.secret_key_base))
+        |> verify
 
         user = case auth do
           %{error: nil} ->
