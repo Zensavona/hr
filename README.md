@@ -7,6 +7,15 @@
 A feature rich and highly customisable user account and authorisation library for Phoenix Framework, heavily inspired by Devise for Rails.
 
 
+<hr>
+<h4 style="color:red;">HR is still under active development and while feature complete, does not have full test coverage and is <strong>not recommended for production use at this stage</strong>. It will be ready for the primetime soon, I promise :heart:</h4>
+<hr>
+
+
+
+
+
+
 ## Installation
 
 HR comes with some generators for installing configuration and creating HR preconfigured models (you can have as many models which represent 'users' as you like). This guide assumes you're creating a new model, but there's a [wiki page](todo...) about adding HR to an existing model. For the purpose of this example, our model will be called User, but it can be called whatever you like. The routes and helpers will match what you name the model.
