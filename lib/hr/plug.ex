@@ -21,10 +21,15 @@ defmodule Hr.Plug do
     |> put_private(:hr_entity, entity)
     |> put_private(:hr_auth_type, "jwt")
 
+    IO.inspect "INCOMING JWT CONN:"
+    IO.inspect conn
+
     {entity, model, repo, _} = Hr.Meta.stuff(conn)
 
     case get_req_header(conn, "authorization") do
       [auth] ->
+        IO.inspect "AUTHORIZATION HEADER FOUND: "
+        IO.inspect auth
 
         auth = auth
         |> String.split(" ")
@@ -33,20 +38,33 @@ defmodule Hr.Plug do
         |> with_signer(hs256(conn.secret_key_base))
         |> verify
 
+        IO.inspect "TOKEN VERIFIED (?): "
+        IO.inspect auth
+
+
         user = case auth do
           %{error: nil} ->
-            repo.get_by(model, [id: auth.claims["id"], email: auth.claims["email"]])
+            user = repo.get_by(model, [id: auth.claims["id"], email: auth.claims["email"]])
+            IO.inspect "NO ERRORS, USER:"
+            IO.inspect user
+
+            user
           _ ->
+            IO.inspect "ERRORS..."
+            IO.inspect auth
+
             false
         end
         assign(conn, :"current_#{entity}", user)
       _ ->
+        IO.inspect "NO AUTHORIZATION HEADER FOUND..."
         conn
     end
   end
 
   def authenticate_user(conn, _opts) do
     IO.inspect conn
+    
     {_, _, _, app} = Hr.Meta.stuff conn
     if Map.has_key?(conn.assigns, :current_user) && conn.assigns.current_user do
       conn
