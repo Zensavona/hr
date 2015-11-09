@@ -13,14 +13,15 @@ defmodule Hr.BaseJWTController do
       def create_session(conn, %{"email" => email, "password" => password}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
 
-        case Hr.UserHelper.authenticate_with_email_and_password(model, repo, email, password) do
-          {:ok, user} ->
-            token = Hr.JWT.create(conn, entity, user)
-            conn |> render("authenticate.json", token: token)
-          {:error, _reason} ->
+        case model.get_with_credentials(email, password) do
+          nil ->
             conn
             |> put_status(:unauthorized)
             |> render("error.json", errors: ["Invalid credentials"])
+          user ->
+            token = Hr.JWT.create(conn, entity, user)
+            response = %{token: token, user: user}
+            conn |> json(response)
         end
       end
 
