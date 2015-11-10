@@ -20,7 +20,7 @@ defmodule Hr.BaseJWTController do
             |> render("error.json", errors: ["Invalid credentials"])
           user ->
             token = Hr.JWT.create(conn, entity, user)
-            response = %{token: token, user: user}
+            response = %{token: token, entity: user}
             conn |> json(response)
         end
       end
@@ -28,33 +28,37 @@ defmodule Hr.BaseJWTController do
       @doc """
       Create a new user if the email address isn't already taken.
       """
-      def create_signup(conn, data) do
+      def create_signup(conn, params) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
 
-        params = data[entity]
-        confirmable? = Enum.member? model.hr_behaviours, :confirmable
+        # params = data[entity]
 
-        if confirmable? do
-          {changeset, token} = Hr.Model.confirmable_signup_changeset(model.__struct__, params)
-        else
-          changeset = Hr.Model.signup_changeset(model.__struct__, params)
-        end
-
-        case repo.insert(changeset) do
-          {:ok, user} ->
-            if confirmable? do
-              link = Hr.Meta.confirmation_url(conn, user.id, token)
-              Hr.Meta.mailer(app).send_confirmation_email(user, link)
-              conn
-              |> render("generic_flash.json", flash: Hr.Meta.i18n(app, "registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
-            else
-              token = Hr.JWT.create(conn, entity, user)
-              conn |> render("authenticate.json", token: token)
+        case model.confirmable? do
+          true ->
+            {changeset, token} = model.confirmable_signup_changeset(params)
+            case model.repo.insert(changeset) do
+              {:ok, user} ->
+                link = Hr.Meta.confirmation_url(conn, user.id, token)
+                Hr.Meta.mailer(app).send_confirmation_email(user, link)
+                conn |> render("generic_flash.json", flash: Hr.Meta.i18n("registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
+              {:error, changeset} ->
+                conn
+                |> put_status(:unprocessable_entity)
+                |> render("error.json", errors: changeset)
             end
-          {:error, changeset} ->
-            conn
-            |> put_status(:unprocessable_entity)
-            |> render("error.json", errors: changeset)
+          _ ->
+            changeset = model.signup_changeset(params)
+            case model.repo.insert(changeset) do
+              {:ok, user} ->
+                token = Hr.JWT.create(conn, entity, user)
+                user = user |> model.get_for_me |> model.repo.one
+                IO.inspect user
+                json(conn, %{token: token, entity: user})
+              {:error, changeset} ->
+                conn
+                |> put_status(:unprocessable_entity)
+                |> render("error.json", errors: changeset)
+            end
         end
       end
 
@@ -64,17 +68,22 @@ defmodule Hr.BaseJWTController do
       def confirmation(conn, params = %{"id" => user_id, "confirmation_token" => _}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
 
-        user = repo.get! model, user_id
-        changeset = Hr.Model.confirmation_changeset(user, params)
-
-        if changeset && changeset.valid? do
-          repo.update!(changeset)
-          conn
-          |> render("generic_flash.json", flash: Hr.Meta.i18n(app, "confirmations.confirmed"))
-        else
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render("error.json", errors: changeset)
+        case model.repo.get(model, user_id) do
+          nil ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> render("error.json", errors: ["Something went wrong"])
+          user ->
+            changeset = model.confirmation_changeset(user, params)
+            case model.repo.update(changeset) do
+              {:ok, _} ->
+                conn
+                |> render("generic_flash.json", flash: Hr.Meta.i18n("confirmations.confirmed"))
+              {:error, changeset} ->
+                conn
+                |> put_status(:unprocessable_entity)
+                |> render("error.json", errors: changeset)
+            end
         end
       end
 
@@ -85,16 +94,16 @@ defmodule Hr.BaseJWTController do
         {entity, model, repo, app} = Hr.Meta.stuff conn
         user = repo.get_by! model, email: email
 
-        case user do
+        case model.repo.get_by(model, email: email) do
           nil ->
             nil
           user ->
-            {changeset, token} = Hr.Model.reset_changeset(user)
+            {changeset, token} = model.reset_changeset(user)
             repo.update!(changeset)
             link = Hr.Meta.reset_url(conn, user.id, token)
             Hr.Meta.mailer(app).send_reset_email(user, link)
         end
-        render(conn, "generic_flash.json", flash: Hr.Meta.i18n(app, "passwords.send_instructions"))
+        render(conn, "generic_flash.json", flash: Hr.Meta.i18n("passwords.send_instructions"))
       end
 
       @doc """
@@ -103,22 +112,21 @@ defmodule Hr.BaseJWTController do
       def create_password_reset(conn, %{"reset" => params}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
 
-        case Hr.UserHelper.get_with_id_and_token(repo, model, params["id"], params["password_reset_token"]) do
+        case model.get_with_id_and_token(params["id"], params["password_reset_token"]) do
           {:ok, user} ->
-            changeset = Hr.Model.new_password_changeset(user, params)
-            if changeset.valid? do
-              repo.update!(changeset)
-              render(conn, "generic_flash.json", flash: Hr.Meta.i18n(app, "passwords.updated"))
-            else
-              conn
-              |> put_status(:unauthorized)
-              |> render("error.json", errors: changeset)
-              # |> put_flash(:error, Hr.Meta.i18n(app, "passwords.invalid"))
+            changeset = model.new_password_changeset(user, params)
+            case model.repo.update(changeset) do
+              {:ok, _} ->
+                render(conn, "generic_flash.json", flash: Hr.Meta.i18n("passwords.updated"))
+              {:error, changeset} ->
+                conn
+                |> put_status(:unauthorized)
+                |> render("error.json", errors: changeset)
             end
           {:error, _} ->
             conn
             |> put_status(:unauthorized)
-            |> render("error.json", errors: Hr.Meta.i18n(app, "passwords.no_token"))
+            |> render("error.json", errors: Hr.Meta.i18n("passwords.no_token"))
         end
       end
 
@@ -127,7 +135,7 @@ defmodule Hr.BaseJWTController do
 
         case Hr.JWT.refresh(conn, token) do
           {:ok, fresh} ->
-            conn |> render("authenticate.json", token: fresh)
+            render(conn, "authenticate.json", token: fresh)
           {:error, error} ->
             conn
             |> put_status(:unprocessable_entity)

@@ -17,7 +17,7 @@ defmodule Hr.RouterHelper do
     model = Module.concat(app, String.capitalize(to_string(entity)))
 
     quote do
-      for route <- default_routes(unquote(entity), unquote(model.hr_behaviours), Hr.JWTController) do
+      for route <- default_routes(unquote(entity), unquote(model.behaviours), Hr.JWTController) do
         {key, route} = route
 
         route =
@@ -49,7 +49,7 @@ defmodule Hr.RouterHelper do
     model = Module.concat(app, String.capitalize(to_string(entity)))
 
     quote do
-      for route <- default_routes(unquote(entity), unquote(model.hr_behaviours)) do
+      for route <- default_routes(unquote(entity), unquote(model.behaviours)) do
         {key, route} = route
 
         route =
@@ -82,7 +82,7 @@ defmodule Hr.RouterHelper do
       registerable: %{
         new_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: controller, function: :new_signup, method: :get},
 
-        create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: controller, function: :create_signup, method: :post}
+        create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}", controller: controller, function: :create_signup, method: :post}
       },
       confirmable: %{
         confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/confirmation", controller: controller, function: :confirmation, method: :get}

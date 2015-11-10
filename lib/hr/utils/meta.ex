@@ -1,4 +1,5 @@
 defmodule Hr.Meta do
+  @app __MODULE__ |> Module.split |> List.first
 
   def stuff(conn) do
     entity = to_string(conn.private.hr_entity)
@@ -104,17 +105,17 @@ defmodule Hr.Meta do
     end
   end
 
-  def i18n(app, message) do
-    if Code.ensure_loaded? Module.concat(app, HrI18n) do
-      Module.concat(app, HrI18n).t!(Hr.Meta.locale, message)
+  def i18n(message) do
+    if Code.ensure_loaded? Module.concat(@app, HrI18n) do
+      Module.concat(@app, HrI18n).t!(Hr.Meta.locale, message)
     else
       Hr.I18n.t!(Hr.Meta.locale, message)
     end
   end
 
-  def i18n(app, message, bindings) do
-    if Code.ensure_loaded? Module.concat(app, HrI18n) do
-      Module.concat(app, HrI18n).t!(Hr.Meta.locale, message, bindings)
+  def i18n(message, bindings) do
+    if Code.ensure_loaded? Module.concat(@app, HrI18n) do
+      Module.concat(@app, HrI18n).t!(Hr.Meta.locale, message, bindings)
     else
       Hr.I18n.t!(Hr.Meta.locale, message, bindings)
     end
