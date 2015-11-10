@@ -85,7 +85,7 @@ defmodule Hr.RouterHelper do
         create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}", controller: controller, function: :create_signup, method: :post}
       },
       confirmable: %{
-        confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/confirmation", controller: controller, function: :confirmation, method: :get}
+        confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/:id/confirmation/:confirmation_token", controller: controller, function: :confirmation, method: :get}
       },
       database_authenticatable: %{
         new_session: %{helper: :"#{entity}_session", path: "/#{entity}/login", controller: controller, function: :new_session, method: :get},

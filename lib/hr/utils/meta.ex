@@ -85,9 +85,11 @@ defmodule Hr.Meta do
 
   def confirmation_url(conn, id, token) do
     {entity, _model, _repo, app} = stuff(conn)
-    path = apply(Module.concat(app, Router.Helpers), :"#{entity}_confirmation_url", [Module.concat(app, Endpoint), :confirmation])
+    apply(Module.concat(app, Router.Helpers), :"#{entity}_confirmation_url", [Module.concat(app, Endpoint), :confirmation, id, token])
+  end
 
-    path <> "?id=#{id}&confirmation_token=#{token}"
+  def jwt_confirmation_url(id, token) do
+    Application.get_env(:hr, :jwt_base_url) <> "/confirm/#{id}/#{token}"
   end
 
   def reset_url(conn, id, token) do

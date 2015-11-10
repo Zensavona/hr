@@ -37,7 +37,7 @@ defmodule Hr.BaseJWTController do
             case model.repo.insert(changeset) do
               {:ok, user} ->
                 user = model.repo.update!(model.unconfirm_email(user))
-                link = Hr.Meta.confirmation_url(conn, user.id, token)
+                link = Hr.Meta.jwt_confirmation_url(user.id, token)
                 Hr.Meta.mailer(app).send_confirmation_email(user, link)
                 conn |> render("generic_flash.json", flash: Hr.Meta.i18n("registrations.signed_up_but_unconfirmed", email: user.unconfirmed_email))
               {:error, changeset} ->
