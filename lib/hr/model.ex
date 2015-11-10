@@ -7,12 +7,10 @@ defmodule Hr.Model do
       @model __MODULE__
       @repo __MODULE__ |> Module.split |> List.first |> Module.concat("Repo")
 
-      @required ~w(email password)
-
       # Changesets
       def signup_changeset(params) do
         @model.__struct__
-        |> cast(params, @required)
+        |> cast(params, @model.required, @model.optional)
         |> validate_format(:email, ~r/@/)
         |> unique_constraint(:email)
         |> validate_length(:password, min: 6, max: 100)
@@ -23,10 +21,10 @@ defmodule Hr.Model do
       takes raw input and returns a model+token tuple with an unconfirmed
       email address and a hashed password.
       """
-      def confirmable_signup_changeset(model, params) do
+      def confirmable_signup_changeset(params) do
         token = YYID.new
-        rtn = model
-        |> cast(params, @required)
+        rtn = @model.__struct__
+        |> cast(params, @model.required, @model.optional)
         |> validate_format(:email, ~r/@/)
         |> unique_constraint(:email)
         |> validate_length(:password, min: 6, max: 100)
@@ -35,16 +33,13 @@ defmodule Hr.Model do
         {rtn, token}
       end
 
-      def unvalidate_email(changeset) do
-        case changeset do
-          %Ecto.Changeset{valid?: true, changes: %{email: email}} ->
-            changeset
-            |> put_change(:email, nil)
-            |> put_change(:unconfirmed_email, email)
-            |> put_change(:confirmation_sent_at, Ecto.DateTime.local)
-          _ ->
-            changeset
-        end
+      def unconfirm_email(user) do
+        email = user.email
+        user
+        |> cast(%{}, @model.required, @model.optional)
+        |> put_change(:email, nil)
+        |> put_change(:unconfirmed_email, email)
+        |> put_change(:confirmation_sent_at, Ecto.DateTime.local)
       end
 
       def confirmation_changeset(user = %{confirmed_at: nil}, params) do
@@ -74,14 +69,17 @@ defmodule Hr.Model do
       ####
 
       def get_with_credentials(email, password) do
-        query = from u in @model, where: u.email == ^email
-        user = @repo.one query
-
-        case Comeonin.Bcrypt.checkpw(password, user.password_hash) do
-          true ->
-            user |> @model.get_for_me |> @repo.one
-          _ ->
+        query = from u in @model, where: u.email == ^email, limit: 1
+        case @repo.one(query) do
+          nil ->
             nil
+          user ->
+            case Comeonin.Bcrypt.checkpw(password, user.password_hash) do
+              true ->
+                user |> @model.get_for_me |> @repo.one
+              _ ->
+                nil
+            end
         end
       end
 
@@ -140,7 +138,7 @@ end
 #   Provides changesets for interacting with HRable models internally
 #   """
 #   import Ecto.Changeset
-#   @required ~w(email password)
+#   @model.required ~w(email password)
 
 # 
 #   def oauth_signup_changeset(model, params) do
@@ -150,7 +148,7 @@ end
 # 
 #   def session_changeset(model, params) do
 #     model
-#     |> cast(params, @required)
+#     |> cast(params, @model.required)
 #     |> put_pass_hash
 #   end
 # 
