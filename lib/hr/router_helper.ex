@@ -79,13 +79,22 @@ defmodule Hr.RouterHelper do
     }
 
     behaviour_routes = %{
+      recoverable: %{
+        new_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: controller, function: :new_password_reset_request, method: :get},
+
+        create_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: controller, function: :create_password_reset_request, method: :post},
+
+        new_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: controller, function: :new_password_reset, method: :get},
+
+        create_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/:id/reset", controller: controller, function: :create_password_reset, method: :post}
+      },
       registerable: %{
         new_signup: %{helper: :"#{entity}_signup", path: "/#{entity}/new", controller: controller, function: :new_signup, method: :get},
 
         create_signup: %{helper: :"#{entity}_signup", path: "/#{entity}", controller: controller, function: :create_signup, method: :post}
       },
       confirmable: %{
-        confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/:id/confirmation/:confirmation_token", controller: controller, function: :confirmation, method: :get}
+        confirmation: %{helper: :"#{entity}_confirmation", path: "/#{entity}/:id/confirm", controller: controller, function: :confirmation, method: :post}
       },
       database_authenticatable: %{
         new_session: %{helper: :"#{entity}_session", path: "/#{entity}/login", controller: controller, function: :new_session, method: :get},
@@ -97,15 +106,6 @@ defmodule Hr.RouterHelper do
         oauth_authorize: %{helper: :"#{entity}_oauth", path: "/#{entity}/oauth/:provider", controller: controller, function: :oauth_authorize, method: :get},
 
         oauth_callback: %{helper: :"#{entity}_oauth", path: "/#{entity}/oauth/:provider/callback", controller: controller, function: :oauth_callback, method: :get},
-      },
-      recoverable: %{
-        new_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: controller, function: :new_password_reset_request, method: :get},
-
-        create_password_reset_request: %{helper: :"#{entity}_password_reset_request", path: "/#{entity}/forgot", controller: controller, function: :create_password_reset_request, method: :post},
-
-        new_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: controller, function: :new_password_reset, method: :get},
-
-        create_password_reset: %{helper: :"#{entity}_password_reset", path: "/#{entity}/reset", controller: controller, function: :create_password_reset, method: :post}
       },
       jwt_refreshable: %{
         create_refreshed_token: %{helper: :"#{entity}_token_refresh", path: "/#{entity}/refresh_token", controller: controller, function: :create_refreshed_token, method: :post}

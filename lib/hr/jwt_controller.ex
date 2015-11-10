@@ -89,9 +89,8 @@ defmodule Hr.BaseJWTController do
       @doc """
       If the email exists, send a reset link
       """
-      def create_password_reset_request(conn, %{"reset" => %{"email" => email}}) do
+      def create_password_reset_request(conn, %{"email" => email}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
-        user = repo.get_by! model, email: email
 
         case model.repo.get_by(model, email: email) do
           nil ->
@@ -99,7 +98,7 @@ defmodule Hr.BaseJWTController do
           user ->
             {changeset, token} = model.reset_changeset(user)
             repo.update!(changeset)
-            link = Hr.Meta.reset_url(conn, user.id, token)
+            link = Hr.Meta.jwt_reset_url(user.id, token)
             Hr.Meta.mailer(app).send_reset_email(user, link)
         end
         render(conn, "generic_flash.json", flash: Hr.Meta.i18n("passwords.send_instructions"))
@@ -108,10 +107,10 @@ defmodule Hr.BaseJWTController do
       @doc """
       Reset the user's password
       """
-      def create_password_reset(conn, %{"reset" => params}) do
+      def create_password_reset(conn, params = %{"id" => user_id, "reset_token" => token}) do
         {entity, model, repo, app} = Hr.Meta.stuff conn
 
-        case model.get_with_id_and_token(params["id"], params["password_reset_token"]) do
+        case model.get_with_id_and_token(user_id, token) do
           {:ok, user} ->
             changeset = model.new_password_changeset(user, params)
             case model.repo.update(changeset) do

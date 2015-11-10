@@ -99,6 +99,10 @@ defmodule Hr.Meta do
     path <> "?id=#{id}&password_reset_token=#{token}"
   end
 
+  def jwt_reset_url(id, token) do
+    Application.get_env(:hr, :jwt_base_url) <> "/reset/#{id}/#{token}"
+  end
+
   def form_view(app) do
     if Code.ensure_loaded? Module.concat(app, HrFormView) do
       Module.concat(app, HrFormView)
