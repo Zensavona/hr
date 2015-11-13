@@ -38,7 +38,7 @@ defmodule Hr.Mixfile do
       {:phoenix_html, "~> 2.1"},
       {:phoenix_ecto, "~> 1.1"},
       {:plug, "~> 1.0"},
-      {:comeonin, "~> 1.3.1"},
+      {:comeonin, "~> 1.5"},
       {:oauth2, "~> 0.3.0"},
       {:yyid, "~> 0.1"},
       {:mailgun, git: "https://github.com/Zensavona/mailgun.git", branch: "fix_config"},
