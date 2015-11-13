@@ -83,7 +83,7 @@ defmodule Hr.Model do
           user ->
             case Comeonin.Bcrypt.checkpw(password, user.password_hash) do
               true ->
-                user |> @model.get_for_me |> @repo.one
+                user |> serialize
               _ ->
                 nil
             end
@@ -134,6 +134,13 @@ defmodule Hr.Model do
       defp do_validate_token(true, changeset), do: changeset
       defp do_validate_token(false, changeset) do
         add_error changeset, :confirmation_token, :invalid
+      end
+
+      defp serialize(struct) do
+        struct
+        |> Map.from_struct
+        |> Enum.filter(fn({k, v}) -> Enum.member?(@model.serializable_fields, k) end)
+        |> Enum.into(%{})
       end
     end
   end
