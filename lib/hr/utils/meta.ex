@@ -1,4 +1,5 @@
 defmodule Hr.Meta do
+  @app __MODULE__ |> Module.split |> List.first
 
   def stuff(conn) do
     entity = to_string(conn.private.hr_entity)
@@ -84,9 +85,11 @@ defmodule Hr.Meta do
 
   def confirmation_url(conn, id, token) do
     {entity, _model, _repo, app} = stuff(conn)
-    path = apply(Module.concat(app, Router.Helpers), :"#{entity}_confirmation_url", [Module.concat(app, Endpoint), :confirmation])
+    apply(Module.concat(app, Router.Helpers), :"#{entity}_confirmation_url", [Module.concat(app, Endpoint), :confirmation, id, token])
+  end
 
-    path <> "?id=#{id}&confirmation_token=#{token}"
+  def jwt_confirmation_url(id, token) do
+    Application.get_env(:hr, :jwt_base_url) <> "/confirm/#{id}/#{token}"
   end
 
   def reset_url(conn, id, token) do
@@ -94,6 +97,10 @@ defmodule Hr.Meta do
     path = apply(Module.concat(app, Router.Helpers), :"#{entity}_password_reset_url", [Module.concat(app, Endpoint), :create_password_reset])
 
     path <> "?id=#{id}&password_reset_token=#{token}"
+  end
+
+  def jwt_reset_url(id, token) do
+    Application.get_env(:hr, :jwt_base_url) <> "/reset/#{id}/#{token}"
   end
 
   def form_view(app) do
@@ -104,17 +111,17 @@ defmodule Hr.Meta do
     end
   end
 
-  def i18n(app, message) do
-    if Code.ensure_loaded? Module.concat(app, HrI18n) do
-      Module.concat(app, HrI18n).t!(Hr.Meta.locale, message)
+  def i18n(message) do
+    if Code.ensure_loaded? Module.concat(@app, HrI18n) do
+      Module.concat(@app, HrI18n).t!(Hr.Meta.locale, message)
     else
       Hr.I18n.t!(Hr.Meta.locale, message)
     end
   end
 
-  def i18n(app, message, bindings) do
-    if Code.ensure_loaded? Module.concat(app, HrI18n) do
-      Module.concat(app, HrI18n).t!(Hr.Meta.locale, message, bindings)
+  def i18n(message, bindings) do
+    if Code.ensure_loaded? Module.concat(@app, HrI18n) do
+      Module.concat(@app, HrI18n).t!(Hr.Meta.locale, message, bindings)
     else
       Hr.I18n.t!(Hr.Meta.locale, message, bindings)
     end
