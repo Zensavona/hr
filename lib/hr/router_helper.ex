@@ -7,7 +7,7 @@ defmodule Hr.RouterHelper do
   end
 
   @doc """
-  hr_routes_for :comrade #, %{new_signup: %{path: "/anus/new"}} OR %{new_signup: %{helper: :"anus_signup", path: "/anus/new", controller: Hr.JWTController, function: :new_signup, method: :get}}
+  hr_routes_for :comrade
   """
   defmacro hr_jwt_routes_for(entity, options \\ {:%{}, [line: 35], []}) do
     # helper, path, function, controller, method
